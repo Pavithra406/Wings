@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Holidays</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .holiday-card { background: linear-gradient(135deg, rgba(17,24,39,0.92), rgba(30,27,75,0.3)); border: 1px solid var(--line); border-radius: 20px; padding: 22px; transition: all 0.2s; }
+    .holiday-card:hover { border-color: rgba(124,58,237,0.35); transform: translateY(-4px); }
+    .holiday-date-badge { display: inline-flex; padding: 6px 14px; border-radius: 999px; background: var(--accent-soft); color: #c4b5fd; font-size: 0.82rem; font-weight: 600; margin-bottom: 10px; }
+    .holiday-name { font-family: 'Cinzel', serif; font-size: 1.05rem; margin: 0 0 6px; }
+    .holiday-desc { color: var(--muted); font-size: 0.85rem; margin: 0; }
+  </style>
+</head>
+<body data-page="holidays">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow"></p><h2 style="margin:0;font-size:1.1rem;">College Calendar</h2></div>
+      <nav class="nav-links">
+        <a href="dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="mess-menu.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="complaint.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="leave.html"><span class="nav-icon">🗓</span> Leave</a>
+        <a href="roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="holidays.html" class="active"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="feedback.html"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer"><a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a></div>
+    </aside>
+    <main class="content-area">
+      <header class="page-header">
+        <div><p class="eyebrow">Academic Notices</p><h1>College Holiday Calendar</h1></div>
+        <div class="pill">📅 Upcoming Holidays</div>
+      </header>
+      <section id="holidayGrid" class="feature-grid" style="margin-bottom:28px;"></section>
+      <section class="panel">
+        <p class="eyebrow">Table View</p>
+        <h2>All Holidays</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Holiday Name</th><th>Date</th><th>Description</th></tr>
+            </thead>
+            <tbody id="holidayTable"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>

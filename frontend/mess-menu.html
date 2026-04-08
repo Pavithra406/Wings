@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mess Menu </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .menu-table-wrap {
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17,24,39,0.95), rgba(11,15,28,0.92));
+    }
+    .menu-table-wrap table { width: 100%; border-collapse: collapse; }
+    .menu-table-wrap thead tr {
+      background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(79,70,229,0.15));
+    }
+    .menu-table-wrap th {
+      padding: 16px 20px;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #c4b5fd;
+      font-weight: 700;
+      border-bottom: 1px solid rgba(124,58,237,0.25);
+      white-space: nowrap;
+    }
+    .menu-table-wrap td {
+      padding: 16px 20px;
+      font-size: 0.92rem;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+    .menu-table-wrap tbody tr:last-child td { border-bottom: none; }
+    .menu-table-wrap tbody tr:hover { background: rgba(124,58,237,0.06); }
+    .meal-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .meal-tag.breakfast { background: rgba(251,191,36,0.12); color: #fbbf24; }
+    .meal-tag.lunch     { background: rgba(52,211,153,0.12); color: #6ee7b7; }
+    .meal-tag.dinner    { background: rgba(124,58,237,0.15); color: #c4b5fd; }
+    .today-row { background: rgba(124,58,237,0.08) !important; }
+    .today-badge {
+      display: inline-flex; padding: 2px 8px; border-radius: 999px;
+      font-size: 0.68rem; background: rgba(124,58,237,0.3); color: #c4b5fd;
+      margin-left: 8px; vertical-align: middle;
+    }
+  </style>
+</head>
+<body data-page="mess-menu">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow"></p><h2 style="margin:0;font-size:1.1rem;">Dining Hall</h2></div>
+      <nav class="nav-links">
+        <a href="dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="mess-menu.html" class="active"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="complaint.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="leave.html"><span class="nav-icon">🗓</span> Leave</a>
+        <a href="roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="holidays.html"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="feedback.html"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Weekly Schedule</p>
+          <h1>Mess Menu</h1>
+          <p id="menuLastUpdatedStudent" style="font-size:0.78rem;color:var(--muted);margin:4px 0 0;"></p>
+        </div>
+        <div class="pill">🍽 7 Days</div>
+      </header>
+
+      <div class="menu-table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Day</th>
+              <th>🌅 Breakfast</th>
+              <th>☀️ Lunch</th>
+              <th>🌙 Dinner</th>
+            </tr>
+          </thead>
+          <tbody id="menuTableBody">
+            <tr>
+              <td colspan="4" style="text-align:center;color:var(--muted);padding:40px;">
+                Loading menu…
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+  <script>
+    // Highlight today's row
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const today = days[new Date().getDay()];
+    document.addEventListener("DOMContentLoaded", () => {
+      setTimeout(() => {
+        document.querySelectorAll("#menuTableBody tr").forEach(row => {
+          if (row.cells[0]?.textContent.includes(today)) {
+            row.classList.add("today-row");
+            const badge = document.createElement("span");
+            badge.className = "today-badge";
+            badge.textContent = "Today";
+            row.cells[0].appendChild(badge);
+          }
+        });
+      }, 500);
+    });
+  </script>
+</body>
+</html>

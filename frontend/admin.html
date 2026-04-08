@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .admin-banner { background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(79,70,229,0.15)); border: 1px solid rgba(124,58,237,0.3); border-radius: 20px; padding: 24px 28px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .admin-banner h1 { margin: 0; font-size: 1.5rem; }
+    .admin-banner p { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .warden-badge { background: rgba(124,58,237,0.3); border: 1px solid rgba(196,181,253,0.3); border-radius: 14px; padding: 12px 20px; text-align: center; }
+    .warden-badge .wl { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .warden-badge .wn { font-size: 1rem; font-weight: 700; color: #c4b5fd; font-family: 'Cinzel', serif; }
+    .section-gap { margin-top: 28px; }
+  </style>
+</head>
+<body data-page="admin-dashboard">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow"></p><h2 style="margin:0;font-size:1.1rem;">Warden Console</h2></div>
+      <nav class="nav-links">
+        <a href="admin.html" class="active"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="admin-mess.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="admin-complaints.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="admin-gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="admin-leave.html"><span class="nav-icon">🗓</span> Leave Requests</a>
+        <a href="admin-roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="admin-holidays.html"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="admin-feedback.html"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer"><a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a></div>
+    </aside>
+    <main class="content-area">
+      <div class="admin-banner">
+        <div>
+          <p class="eyebrow">Operations Center</p>
+          <h1>Admin Dashboard</h1>
+          <p>Manage all hostel operations from one place.</p>
+        </div>
+        <div class="warden-badge">
+          <div class="wl">Role</div>
+          <div class="wn">🏰 Warden</div>
+        </div>
+      </div>
+
+      <section id="statsGrid" class="stats-grid" style="margin-bottom:28px;"></section>
+
+      <p class="eyebrow" style="margin-bottom:16px;">Quick Management</p>
+      <section class="admin-nav-grid">
+        <a class="feature-card compact-action" href="admin-mess.html">
+          <div class="card-icon">🍽</div>
+          <h3>Mess Menu</h3>
+          <p>Update the weekly dining schedule.</p>
+        </a>
+        <a class="feature-card compact-action" href="admin-complaints.html">
+          <div class="card-icon">🛠</div>
+          <h3>Complaints</h3>
+          <p>Track and resolve student issues.</p>
+        </a>
+        <a class="feature-card compact-action" href="admin-gatepass.html">
+          <div class="card-icon">🚪</div>
+          <h3>Gate Pass</h3>
+          <p>Review requests and parent links.</p>
+        </a>
+        <a class="feature-card compact-action" href="admin-leave.html">
+          <div class="card-icon">🗓</div>
+          <h3>Leave Requests</h3>
+          <p>Approve leave after parent confirmation.</p>
+        </a>
+        <a class="feature-card compact-action" href="admin-roomswap.html">
+          <div class="card-icon">🛏</div>
+          <h3>Room Swap</h3>
+          <p>Manage swap requests between rooms.</p>
+        </a>
+        <a class="feature-card compact-action" href="admin-holidays.html">
+          <div class="card-icon">📅</div>
+          <h3>Holidays</h3>
+          <p>Add, edit, and remove holiday notices.</p>
+        </a>
+        <a class="feature-card compact-action" href="admin-feedback.html">
+          <div class="card-icon">⭐</div>
+          <h3>Food Feedback</h3>
+          <p>Read student meal reviews and ratings.</p>
+        </a>
+      </section>
+
+      <div class="section-gap">
+        <p class="eyebrow" style="margin-bottom:16px;">Analytics</p>
+        <section class="chart-grid">
+          <div class="panel">
+            <p class="eyebrow">Complaint Status</p>
+            <h2>Complaint Mix</h2>
+            <canvas id="complaintChart" height="220"></canvas>
+          </div>
+          <div class="panel">
+            <p class="eyebrow">Leave Requests</p>
+            <h2>Monthly Leave Count</h2>
+            <canvas id="leaveChart" height="220"></canvas>
+          </div>
+          <div class="panel">
+            <p class="eyebrow">Food Ratings</p>
+            <h2>Rating Distribution</h2>
+            <canvas id="feedbackChart" height="220"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <div class="section-gap">
+        <p class="eyebrow" style="margin-bottom:16px;">Recent Activity</p>
+        <section class="panel">
+          <h2>Latest Operations</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Type</th><th>Reference</th><th>Details</th><th>Status</th></tr>
+              </thead>
+              <tbody id="recentActivityTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>

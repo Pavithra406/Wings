@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Holidays</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="admin-holidays">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow"></p><h2 style="margin:0;font-size:1.1rem;">Warden Console</h2></div>
+      <nav class="nav-links">
+        <a href="admin.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="admin-mess.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="admin-complaints.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="admin-gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="admin-leave.html"><span class="nav-icon">🗓</span> Leave Requests</a>
+        <a href="admin-roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="admin-holidays.html" class="active"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="admin-feedback.html"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer"><a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a></div>
+    </aside>
+    <main class="content-area two-col">
+      <section class="panel">
+        <p class="eyebrow">College Holidays</p>
+        <h1>Add or Edit Holiday</h1>
+        <p class="panel-note">Add new holidays or edit existing ones. Students will see these on their calendar.</p>
+        <form id="holidayForm" class="stack-form">
+          <input type="hidden" name="id">
+          <label><span>Holiday Name</span><input type="text" name="holidayName" placeholder="e.g. Pongal" required></label>
+          <label><span>Holiday Date</span><input type="date" name="holidayDate" required></label>
+          <label><span>Description</span><input type="text" name="description" placeholder="e.g. Festival Holiday" required></label>
+          <button type="submit" class="primary-btn" style="justify-content:center;">📅 Save Holiday</button>
+        </form>
+        <p id="holidayMessage" class="inline-message"></p>
+      </section>
+      <section class="panel">
+        <p class="eyebrow">Holiday List</p>
+        <h2>Manage Notices</h2>
+        <div id="adminHolidayList" class="feed-list"></div>
+      </section>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>

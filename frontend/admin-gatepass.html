@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Gate Pass | Nevermore</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .phone-strip {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(79,70,229,0.12); border: 1px solid rgba(196,181,253,0.2);
+      border-radius: 12px; padding: 10px 14px; margin: 10px 0;
+    }
+    .phone-strip .ph-icon { font-size: 1.2rem; }
+    .phone-strip .ph-num { font-size: 0.95rem; font-weight: 700; color: #c4b5fd; letter-spacing: 0.04em; }
+    .phone-strip .ph-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .status-timeline { display: flex; gap: 6px; flex-wrap: wrap; margin: 10px 0; }
+    .status-step { display: flex; align-items: center; gap: 5px; font-size: 0.78rem; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); background: rgba(255,255,255,0.03); color: var(--muted); }
+    .status-step.done { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.3); color: #6ee7b7; }
+    .status-step.active { background: rgba(251,191,36,0.12); border-color: rgba(251,191,36,0.3); color: #fbbf24; }
+    .status-step.rejected { background: rgba(253,164,175,0.12); border-color: rgba(253,164,175,0.3); color: #fda4af; }
+  </style>
+</head>
+<body data-page="admin-gatepass">
+
+  <!-- ══════════════════════════════════════════
+       IVR SIMULATED CALL SCREEN MODAL
+  ══════════════════════════════════════════ -->
+  <div class="ivr-overlay hidden" id="ivrOverlay" role="dialog" aria-modal="true" aria-label="Parent Verification Call">
+    <div class="ivr-phone" id="ivrPhone">
+      <div class="ivr-dtmf-flash" id="ivrFlash"></div>
+      <div class="ivr-notch"></div>
+
+      <div class="ivr-caller-icon">📞</div>
+      <p class="ivr-caller-label">Incoming Verification Call</p>
+      <p class="ivr-caller-name">Parent Verification System</p>
+      <p class="ivr-caller-sub" id="ivrStudentSub">Hostel Gate Pass Request</p>
+
+      <div class="ivr-timer" id="ivrTimer">00:00</div>
+      <div class="ivr-status-text">
+        <span class="ivr-status-dot"></span>
+        <span id="ivrStatusText">Call Connected</span>
+      </div>
+
+      <!-- Parent phone being called -->
+      <div style="background:rgba(79,70,229,0.15);border:1px solid rgba(196,181,253,0.2);border-radius:12px;padding:10px 16px;margin-bottom:14px;text-align:center;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;">Calling Parent</div>
+        <div style="font-size:1.1rem;font-weight:700;color:#c4b5fd;letter-spacing:0.06em;" id="ivrParentPhone">—</div>
+      </div>
+
+      <div class="ivr-message">
+        <p>Your child has requested permission to leave the hostel premises.</p>
+        <p class="ivr-prompt">Press <strong>1</strong> to approve the gate pass.</p>
+        <p class="ivr-prompt">Press <strong>2</strong> to reject the gate pass.</p>
+      </div>
+
+      <div class="ivr-detail-strip" id="ivrDetailStrip">
+        <div class="ivr-detail-cell"><div class="lbl">Student</div><div class="val" id="ivrStudentName">—</div></div>
+        <div class="ivr-detail-cell"><div class="lbl">Room</div><div class="val" id="ivrRoomNumber">—</div></div>
+        <div class="ivr-detail-cell"><div class="lbl">Out Time</div><div class="val" id="ivrOutTime">—</div></div>
+        <div class="ivr-detail-cell"><div class="lbl">Return</div><div class="val" id="ivrReturnTime">—</div></div>
+      </div>
+
+      <div class="ivr-keypad" id="ivrKeypad">
+        <button class="ivr-key approve" id="ivrKey1" onclick="ivrPress('1')">
+          <span class="ivr-key-num">1</span>
+          <span class="ivr-key-label">✅ Approve</span>
+        </button>
+        <button class="ivr-key reject" id="ivrKey2" onclick="ivrPress('2')">
+          <span class="ivr-key-num">2</span>
+          <span class="ivr-key-label">❌ Reject</span>
+        </button>
+      </div>
+
+      <div class="ivr-result" id="ivrResult">
+        <div class="ivr-result-icon" id="ivrResultIcon">✅</div>
+        <div class="ivr-result-title" id="ivrResultTitle">Gate Pass Approved</div>
+        <div class="ivr-result-sub" id="ivrResultSub">Parent verification recorded. Status updated.</div>
+      </div>
+
+      <button class="ivr-end-btn" id="ivrEndBtn" onclick="ivrClose()" title="End Call">📵</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════
+       MAIN LAYOUT
+  ══════════════════════════════════════════ -->
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow">Nevermore</p><h2 style="margin:0;font-size:1.1rem;">Warden Console</h2></div>
+      <nav class="nav-links">
+        <a href="admin.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="admin-mess.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="admin-complaints.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="admin-gatepass.html" class="active"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="admin-leave.html"><span class="nav-icon">🗓</span> Leave Requests</a>
+        <a href="admin-roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="admin-holidays.html"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="admin-feedback.html"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <header class="page-header">
+        <div><p class="eyebrow">Gate Control</p><h1>Gate Pass Approval Queue</h1></div>
+        <div class="pill">🚪 Pending Review</div>
+      </header>
+
+      <div class="panel-note" style="margin-bottom:20px;">
+        📞 Click <strong>Send Parent Verification</strong> to launch the simulated IVR call screen.
+        The parent's phone number is auto-fetched from the student record.
+        Parent presses <strong>1</strong> to approve or <strong>2</strong> to reject — status updates instantly.
+        <br><br>
+        🔌 <em>Production note: Replace the simulated call with Twilio by adding <code>TWILIO_ACCOUNT_SID</code>, <code>TWILIO_AUTH_TOKEN</code>, and <code>TWILIO_PHONE_NUMBER</code> to your <code>.env</code> file.</em>
+      </div>
+
+      <section class="panel">
+        <div id="adminGatePassList" class="feed-list"></div>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

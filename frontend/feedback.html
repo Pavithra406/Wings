@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food Feedback</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .feedback-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+    .tab-btn { padding: 10px 20px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; font-family: 'Manrope', sans-serif; font-size: 0.9rem; transition: all 0.2s; }
+    .tab-btn.active { background: var(--accent-soft); color: #c4b5fd; border-color: rgba(196,181,253,0.3); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+    .star-row { display: flex; gap: 6px; margin: 8px 0; }
+    .star-btn { font-size: 1.8rem; background: none; border: none; cursor: pointer; color: #374151; transition: color 0.15s, transform 0.15s; padding: 0; }
+    .star-btn:hover, .star-btn.active { color: #fbbf24; transform: scale(1.15); }
+    .form-links-grid { display: grid; gap: 14px; }
+    .form-link-card { display: flex; align-items: center; gap: 16px; padding: 18px 20px; border-radius: 18px; background: rgba(124,58,237,0.1); border: 1px solid rgba(196,181,253,0.15); text-decoration: none; color: var(--text); transition: all 0.2s; }
+    .form-link-card:hover { background: rgba(124,58,237,0.18); transform: translateX(4px); }
+    .form-link-icon { font-size: 1.8rem; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px; background: var(--accent-soft); flex-shrink: 0; }
+    .form-link-card h3 { margin: 0 0 4px; font-size: 0.95rem; }
+    .form-link-card p { margin: 0; font-size: 0.82rem; color: var(--muted); }
+    .form-link-arrow { margin-left: auto; color: var(--muted); font-size: 1.2rem; }
+    .rating-selected { font-size: 1.1rem; color: #fbbf24; margin-top: 4px; min-height: 24px; }
+  </style>
+</head>
+<body data-page="feedback">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow"></p><h2 style="margin:0;font-size:1.1rem;">Mess Review</h2></div>
+      <nav class="nav-links">
+        <a href="dashboard.html"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="mess-menu.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="complaint.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="leave.html"><span class="nav-icon">🗓</span> Leave</a>
+        <a href="roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="holidays.html"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="feedback.html" class="active"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer"><a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a></div>
+    </aside>
+    <main class="content-area">
+      <header class="page-header">
+        <div><p class="eyebrow">Mess Review</p><h1>Food Feedback</h1></div>
+        <div class="pill">⭐ Rate Your Meals</div>
+      </header>
+
+      <div class="feedback-tabs">
+        <button class="tab-btn active" onclick="switchTab('quick')">Quick Rating</button>
+        <button class="tab-btn" onclick="switchTab('forms')">Google Forms</button>
+        <button class="tab-btn" onclick="switchTab('wall')">Feedback Wall</button>
+      </div>
+
+      <!-- Quick Rating Tab -->
+      <div id="tab-quick" class="tab-panel active">
+        <div class="two-col">
+          <section class="panel">
+            <p class="eyebrow">Rate Today's Meal</p>
+            <h2>Submit Feedback</h2>
+            <form id="feedbackForm" class="stack-form">
+              <label>
+                <span>Star Rating</span>
+                <div class="star-row" id="starRow">
+                  <button type="button" class="star-btn" data-val="1">★</button>
+                  <button type="button" class="star-btn" data-val="2">★</button>
+                  <button type="button" class="star-btn" data-val="3">★</button>
+                  <button type="button" class="star-btn" data-val="4">★</button>
+                  <button type="button" class="star-btn" data-val="5">★</button>
+                </div>
+                <div class="rating-selected" id="ratingLabel">Click a star to rate</div>
+                <input type="hidden" name="rating" id="ratingInput" required>
+              </label>
+              <label><span>Comment</span><textarea name="comment" rows="4" placeholder="Share your thoughts about today's meal..." required></textarea></label>
+              <button type="submit" class="primary-btn" style="justify-content:center;">⭐ Submit Feedback</button>
+            </form>
+            <p id="feedbackMessage" class="inline-message"></p>
+          </section>
+          <section class="panel">
+            <p class="eyebrow">Recent Reviews</p>
+            <h2>Latest Feedback</h2>
+            <div id="feedbackList" class="feed-list"></div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Google Forms Tab -->
+      <div id="tab-forms" class="tab-panel">
+        <section class="panel">
+          <p class="eyebrow">Official Feedback Forms</p>
+          <h2>Google Forms</h2>
+          <p style="color:var(--muted);margin-bottom:20px;">Use these official forms to submit detailed feedback to the hostel management.</p>
+          <div class="form-links-grid">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdVylbREFBg0CaZc1hzF1Ze848fIvXvMSKXxRVQJxE9tZfJ9A/viewform" target="_blank" rel="noreferrer" class="form-link-card">
+              <div class="form-link-icon">📋</div>
+              <div>
+                <h3>Mess Feedback Form — Set 1</h3>
+                <p>Rate food quality, hygiene, and service for this week</p>
+              </div>
+              <span class="form-link-arrow">↗</span>
+            </a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdJe67SEbp8HfR9cERgAUMK0GEXCZ-f67c6N9KngRl1aJMJlg/viewform?usp=sf_link" target="_blank" rel="noreferrer" class="form-link-card">
+              <div class="form-link-icon">📝</div>
+              <div>
+                <h3>Mess Feedback Form — Set 2</h3>
+                <p>Detailed feedback on menu variety and meal timings</p>
+              </div>
+              <span class="form-link-arrow">↗</span>
+            </a>
+          </div>
+        </section>
+      </div>
+
+      <!-- Feedback Wall Tab -->
+      <div id="tab-wall" class="tab-panel">
+        <section class="panel">
+          <p class="eyebrow">Student Voices</p>
+          <h2>Feedback Wall</h2>
+          <div id="feedbackWall" class="feedback-wall"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+  <script>
+    function switchTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('tab-' + name).classList.add('active');
+      event.target.classList.add('active');
+      if (name === 'wall') loadFeedbackWall();
+    }
+
+    // Star rating interaction
+    const stars = document.querySelectorAll('.star-btn');
+    const ratingInput = document.getElementById('ratingInput');
+    const ratingLabel = document.getElementById('ratingLabel');
+    const labels = ['', 'Poor 😞', 'Fair 😐', 'Good 🙂', 'Great 😊', 'Excellent 🤩'];
+    stars.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const val = parseInt(btn.dataset.val);
+        ratingInput.value = val;
+        ratingLabel.textContent = '★'.repeat(val) + '☆'.repeat(5 - val) + '  ' + labels[val];
+        stars.forEach((s, i) => s.classList.toggle('active', i < val));
+      });
+    });
+
+    async function loadFeedbackWall() {
+      const res = await fetch('/api/feedback');
+      const data = await res.json();
+      const wall = document.getElementById('feedbackWall');
+      if (!data.length) { wall.innerHTML = '<div class="empty-state"><div class="empty-icon">💬</div><p>No feedback yet.</p></div>'; return; }
+      wall.innerHTML = data.map(item => `
+        <div class="feedback-wall-item">
+          <div class="stars-display">${'★'.repeat(item.rating)}${'☆'.repeat(5-item.rating)}</div>
+          <div class="rating-number">${item.rating}<span style="font-size:1rem;color:var(--muted)">/5</span></div>
+          <p style="color:var(--muted);font-size:0.85rem;margin-top:8px;">${item.comment}</p>
+        </div>
+      `).join('');
+    }
+  </script>
+</body>
+</html>

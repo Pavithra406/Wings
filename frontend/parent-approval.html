@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parent Approval Hostel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .approval-card { width: min(560px, 100%); text-align: left; }
+    .approval-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--line); }
+    .approval-icon { width: 56px; height: 56px; border-radius: 18px; background: var(--accent-soft); display: grid; place-items: center; font-size: 1.6rem; flex-shrink: 0; }
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+    .detail-item { padding: 14px 16px; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--line); }
+    .detail-item .label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 4px; }
+    .detail-item .value { font-size: 0.95rem; color: var(--text); font-weight: 500; }
+    .message-box { padding: 16px; border-radius: 14px; background: rgba(124,58,237,0.1); border: 1px solid rgba(196,181,253,0.2); margin-bottom: 20px; color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+    .approval-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .approve-btn { background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 8px 24px rgba(16,185,129,0.3); }
+    .reject-btn { background: linear-gradient(135deg, #dc2626, #ef4444); box-shadow: 0 8px 24px rgba(239,68,68,0.3); }
+    .approve-btn:hover { box-shadow: 0 14px 32px rgba(16,185,129,0.45); }
+    .reject-btn:hover { box-shadow: 0 14px 32px rgba(239,68,68,0.45); }
+    @media (max-width: 480px) { .detail-grid { grid-template-columns: 1fr; } .approval-btns { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body data-page="parent-approval">
+  <div class="stars-overlay" id="starsOverlay"></div>
+  <main class="auth-shell">
+    <section class="auth-card approval-card fade-in">
+      <p class="eyebrow">Nevermore Hostel Portal</p>
+      <div class="approval-header">
+        <div class="approval-icon">👨‍👩‍👧</div>
+        <div>
+          <h1 id="parentApprovalTitle" style="font-size:1.4rem;margin:0 0 4px;">Hostel Approval Request</h1>
+          <p style="margin:0;color:var(--muted);font-size:0.88rem;">Your child has submitted a request that requires your approval.</p>
+        </div>
+      </div>
+      <div id="parentApprovalDetails"></div>
+      <div class="message-box" id="messageBox" style="display:none;"></div>
+      <div class="approval-btns" id="approvalBtns">
+        <button class="primary-btn approve-btn" id="parentApproveBtn" style="justify-content:center;">✅ Approve</button>
+        <button class="primary-btn reject-btn" id="parentRejectBtn" style="justify-content:center;">❌ Reject</button>
+      </div>
+      <p id="parentApprovalMessage" class="inline-message" style="margin-top:16px;text-align:center;"></p>
+    </section>
+  </main>
+  <script src="js/script.js"></script>
+  <script>
+    const overlay = document.getElementById('starsOverlay');
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;`;
+      overlay.appendChild(s);
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+{
+  "students": [
+    {
+      "userId": "STU1001",
+      "password": "nevermore123",
+      "role": "student",
+      "name": "Aarav D'Souza",
+      "roomNumber": "A-204",
+      "parentPhone": "+919876543210"
+    },
+    {
+      "userId": "STU1002",
+      "password": "pass123",
+      "role": "student",
+      "name": "Pavithra",
+      "roomNumber": "28",
+      "parentPhone": "6380044904"
+    },
+    {
+      "userId": "STU1003",
+      "password": "pass456",
+      "role": "student",
+      "name": "Subitha",
+      "roomNumber": "29",
+      "parentPhone": "8807149866"
+    },
+    {
+      "userId": "205119",
+      "password": "pavi123",
+      "role": "student",
+      "name": "Pavithra",
+      "roomNumber": "28",
+      "parentPhone": "6380044904"
+    },
+    {
+      "userId": "205159",
+      "password": "subi123",
+      "role": "student",
+      "name": "Subitha",
+      "roomNumber": "29",
+      "parentPhone": "8807149866"
+    }
+  ],
+  "admins": [
+    {
+      "userId": "ADMIN01",
+      "password": "ravens@123",
+      "role": "admin",
+      "name": "Warden Ophelia"
+    }
+  ],
+  "messMenu": [
+    {
+      "day": "Monday",
+      "breakfast": "Idli, Sambar, Vada",
+      "lunch": "Rice, Sambar, Veg Curry",
+      "dinner": "Chapati, Paneer Curry"
+    },
+    {
+      "day": "Tuesday",
+      "breakfast": "Dosa, Chutney",
+      "lunch": "Lemon Rice, Dal",
+      "dinner": "Roti, Mixed Veg Curry"
+    },
+    {
+      "day": "Wednesday",
+      "breakfast": "Poha, Tea",
+      "lunch": "Jeera Rice, Rajma",
+      "dinner": "Paratha, Aloo Matar"
+    },
+    {
+      "day": "Thursday",
+      "breakfast": "Upma, Coconut Chutney",
+      "lunch": "Curd Rice, Beetroot Fry",
+      "dinner": "Noodles, Manchurian"
+    },
+    {
+      "day": "Friday",
+      "breakfast": "Puri, Potato Masala",
+      "lunch": "Veg Biryani, Raita",
+      "dinner": "Chapati, Dal Tadka"
+    },
+    {
+      "day": "Saturday",
+      "breakfast": "Bread Omelette, Milk",
+      "lunch": "Fried Rice, Chilli Paneer",
+      "dinner": "Roti, Kadai Veg"
+    },
+    {
+      "day": "Sunday",
+      "breakfast": "Poori, Kesari",
+      "lunch": "Chicken Curry, Rice",
+      "dinner": "Masala Dosa, Chutney"
+    }
+  ],
+  "complaints": [
+    {
+      "id": "CMP002",
+      "roomNumber": "101",
+      "complaintType": "Water",
+      "issueDescription": "no water \n",
+      "status": "In Progress",
+      "createdAt": "2026-04-07T10:50:43.980Z"
+    },
+    {
+      "id": "CMP001",
+      "roomNumber": "A-204",
+      "complaintType": "Electrical",
+      "issueDescription": "Reading lamp is flickering.",
+      "status": "In Progress",
+      "createdAt": "2026-04-02T09:30:00.000Z"
+    }
+  ],
+  "gatePasses": [
+    {
+      "id": "GP004",
+      "studentName": "Subitha",
+      "roomNumber": "28",
+      "outTime": "2026-04-06T04:30",
+      "returnTime": "2026-04-08T08:30",
+      "reason": "fever",
+      "parentPhone": "8807149866",
+      "status": "Pending",
+      "parentApproval": "Approved",
+      "parentVerification": "Accepted",
+      "adminApproval": "Pending",
+      "approvalToken": "b64cdf121503f93518b99181b32e91c6",
+      "approvalLink": "http://localhost:3000/parent-approval.html?type=gatepass&token=b64cdf121503f93518b99181b32e91c6",
+      "qrCode": "",
+      "createdAt": "2026-04-06T06:15:44.096Z",
+      "callSid": "SIM-1775559135301",
+      "callMode": "simulation"
+    },
+    {
+      "id": "GP003",
+      "studentName": "Pavithra",
+      "roomNumber": "28",
+      "outTime": "2026-04-04T16:40",
+      "returnTime": "2026-04-06T08:30",
+      "reason": "Weekend visit",
+      "parentPhone": "6380044904",
+      "status": "Rejected",
+      "parentApproval": "Rejected",
+      "parentVerification": "Rejected",
+      "adminApproval": "Pending",
+      "approvalToken": "d6bdf33e8a6bb4cb49aacd2422c6d029",
+      "approvalLink": "/parent-approval.html?type=gatepass&token=d6bdf33e8a6bb4cb49aacd2422c6d029",
+      "qrCode": "",
+      "createdAt": "2026-04-04T06:51:25.412Z",
+      "callSid": "SIM-1775458040462",
+      "callMode": "simulation"
+    },
+    {
+      "id": "GP002",
+      "studentName": "Pavithra",
+      "roomNumber": "28",
+      "outTime": "2026-04-04T16:40",
+      "returnTime": "2026-04-06T08:15",
+      "reason": "Weekend visit",
+      "parentPhone": "6380044904",
+      "status": "Approved",
+      "parentApproval": "Approved",
+      "parentVerification": "Accepted",
+      "adminApproval": "Approved",
+      "approvalToken": "88509ec6e661ea9a9427b65e8e73ed5c",
+      "approvalLink": "/parent-approval.html?type=gatepass&token=88509ec6e661ea9a9427b65e8e73ed5c",
+      "qrCode": "",
+      "createdAt": "2026-04-04T05:43:11.763Z"
+    },
+    {
+      "id": "GP001",
+      "studentName": "Aarav D'Souza",
+      "roomNumber": "A-204",
+      "outTime": "2026-04-05T15:00",
+      "returnTime": "2026-04-05T20:00",
+      "reason": "Medical appointment",
+      "parentPhone": "+919876543210",
+      "status": "Approved",
+      "parentApproval": "Approved",
+      "parentVerification": "Accepted",
+      "adminApproval": "Approved",
+      "approvalToken": "d085f2850bc910afe05817024c013802",
+      "approvalLink": "/parent-approval.html?type=gatepass&token=d085f2850bc910afe05817024c013802",
+      "qrCode": "data:image/png;base64,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vkllqjhR+SaVNyomlaliUpkqTlQmlanipGJSmSpOKiaVqeKk4g2VT1R808Na6xoPa61rPKy1rvHD5VSmikllUpkqpopJ5URlqphUTipOVP4mlaliqjhROamYKiaVNypOKiaVqeKNihOVSWWq+MTDWusaD2utazysta7xw4cqTlSmipOKE5WpYlKZVKaKf0nlpOJE5ZtUPlFxovKbVE5UpoqpYlI5qfhND2utazysta7xsNa6xg8fUjmpeEPlmyomlROVv6liUjmpmFTeqJhUTipOVKaKqeINlUllqpgqJpWp4kRlqphUTlSmik88rLWu8bDWusbDWusaP3xZxTdVTCpvqJxUfFPFScUbFW+ovFExqXyTyicqTlSmiknlv+RhrXWNh7XWNR7WWtf44ctUTireUJkqTio+oXJScaIyVUwqJxUnKicVk8qk8obKScWk8ptUPlFxonKiMlV808Na6xoPa61rPKy1rmF/8AGVb6o4UflNFb9J5RMVk8pJxaRyUvGGylRxovKJikllqnhDZar4lx7WWtd4WGtd42GtdY0fPlRxojJVnKi8UTGpvFFxojJVTCpvVJyofJPKJ1ROKt6oOFE5UZkqTlSmik+onFR84mGtdY2HtdY1HtZa17A/+IDKScWJyknFpDJVvKFyUnGiclIxqbxRMan8popJ5V+qOFGZKiaVf6niEw9rrWs8rLWu8bDWuob9wRepTBWfUJkqvkllqphUpopJ5RMVf5PKVHGiclJxovJGxaTymyomlaliUjmp+MTDWusaD2utazysta5hf/ABlaliUpkqJpWp4kTlExUnKt9UMamcVJyonFRMKlPFicobFZPKVPGGyhsVb6icVEwqU8VvelhrXeNhrXWNh7XWNX74UMWkMlWcVEwqJxWTyhsqU8UnKk5Upoo3VN5QmSpOVKaKE5VvUvkmlZOKE5Wp4kRlqvjEw1rrGg9rrWs8rLWuYX/wRSpvVLyhclIxqZxUnKi8UTGp3KTiDZWp4g2VqeJEZap4Q2WqOFF5o+I3Pay1rvGw1rrGw1rrGj98SOWNijdUTireqJhUPlHxRsWkMlVMKt+kMlVMKm+ofEJlqjhReUPlm1Smim96WGtd42GtdY2HtdY1fvhQxW+qOFE5qTip+CaVqWJSmSreqHhDZaqYVL6pYlJ5Q2WqeKPiDZWp4g2VqeITD2utazysta7xsNa6xg8fUvmbKk4q/iaVT6hMFW+oTBWfqDhRmSpOKt6oOKmYVE5UpooTlanib3pYa13jYa11jYe11jV++LKKb1L5JpWpYlKZKk4qTlR+U8XNVKaKqWJS+aaKNypOVKaKb3pYa13jYa11jYe11jV++GUqb1R8QmWqmCpOKiaVk4pJZar4JpV/qeKbVE4qJpUTlU+ovKEyVXziYa11jYe11jUe1lrX+OF/TMW/VDGpTBWTylQxVbyhMlVMKm+oTBWTylTxRsWJylQxqZxUfEJlqphUvulhrXWNh7XWNR7WWtf44T+uYlL5RMU3VUwq36QyVZxUTConFZPKJ1ROKk5UpopJ5Q2Vk4q/6WGtdY2HtdY1HtZa1/jhl1XcrOKk4psqfpPKJ1SmipOKNyomlUnlb6o4UfmbHtZa13hYa13jYa11jR++TOVvUpkq3lD5v6RiUpkqJpWpYlJ5Q+WkYlL5hMpUMam8UTGpfNPDWusaD2utazysta5hf7DWusLDWusaD2utazysta7xsNa6xsNa6xoPa61rPKy1rvGw1rrGw1rrGg9rrWs8rLWu8bDWusbDWusaD2utazysta7x/wB7sYQWsfOL5QAAAABJRU5ErkJggg==",
+      "createdAt": "2026-04-03T11:00:00.000Z"
+    }
+  ],
+  "leaveRequests": [
+    {
+      "id": "LV001",
+      "studentName": "Aarav D'Souza",
+      "roomNumber": "A-204",
+      "fromDate": "2026-04-10",
+      "toDate": "2026-04-12",
+      "reason": "Family function",
+      "status": "Pending",
+      "parentApproval": "Pending",
+      "adminApproval": "Pending",
+      "approvalToken": "9a50888f29b2e7e055418f337422201c",
+      "approvalLink": "/parent-approval.html?type=leave&token=9a50888f29b2e7e055418f337422201c",
+      "createdAt": "2026-04-01T10:15:00.000Z",
+      "parentVerification": "Pending"
+    }
+  ],
+  "roomSwaps": [
+    {
+      "id": "RS001",
+      "currentRoomNumber": "A-204",
+      "requestedRoomNumber": "B-101",
+      "reason": "Closer to academic block",
+      "status": "Approved",
+      "createdAt": "2026-04-02T13:00:00.000Z"
+    }
+  ],
+  "feedback": [
+    {
+      "id": "FDB002",
+      "rating": 5,
+      "comment": "very good food",
+      "createdAt": "2026-04-07T10:49:55.507Z"
+    },
+    {
+      "id": "FDB001",
+      "rating": 4,
+      "comment": "Food was good but slightly spicy.",
+      "createdAt": "2026-04-01T17:00:00.000Z"
+    }
+  ],
+  "holidays": [
+    {
+      "id": "HOL001",
+      "holidayName": "Pongal Holiday",
+      "holidayDate": "2026-01-14",
+      "description": "Festival Holiday"
+    },
+    {
+      "id": "HOL002",
+      "holidayName": "Republic Day",
+      "holidayDate": "2026-01-26",
+      "description": "National Holiday"
+    },
+    {
+      "id": "HOL003",
+      "holidayName": "College Day",
+      "holidayDate": "2026-03-10",
+      "description": "Institutional Event"
+    }
+  ]
+}

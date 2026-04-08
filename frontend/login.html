@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Hostel Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .auth-card { position: relative; overflow: hidden; }
+    .auth-card::before { content: ''; position: absolute; top: -60px; right: -60px; width: 180px; height: 180px; border-radius: 50%; background: radial-gradient(circle, rgba(124,58,237,0.2), transparent 70%); pointer-events: none; }
+    .login-logo { font-size: 2.5rem; margin-bottom: 4px; }
+    .login-title { font-size: 1.8rem; margin-bottom: 4px; background: linear-gradient(135deg, #e5e7eb, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; transition: color 0.2s; }
+    .back-link:hover { color: #c4b5fd; }
+    .demo-box strong { color: var(--text); }
+  </style>
+</head>
+<body data-page="login">
+  <div class="stars-overlay" id="starsOverlay"></div>
+  <main class="auth-shell">
+    <section class="auth-card fade-in">
+      <a href="index.html" class="back-link">← Back to Portal</a>
+      <div class="login-logo">🏰</div>
+      <p class="eyebrow">Resident Access</p>
+      <h1 class="login-title">Enter</h1>
+      <p class="auth-copy">Credentials are issued by hostel administration. Contact the warden if you need access.</p>
+      <form id="loginForm" class="stack-form">
+        <label>
+          <span>User ID</span>
+          <input type="text" name="userId" placeholder="STU1001" autocomplete="username" required>
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="primary-btn" style="width:100%;justify-content:center;">🔓 Login</button>
+      </form>
+      <div class="demo-box">
+        <p style="font-weight:600;color:#c4b5fd;margin-bottom:8px;">Demo Credentials</p>
+        <p>Student: <strong>STU1001</strong> / <strong>nevermore123</strong></p>
+        <p>Admin: <strong>ADMIN01</strong> / <strong>ravens@123</strong></p>
+      </div>
+      <p id="loginMessage" class="inline-message"></p>
+    </section>
+  </main>
+  <script src="js/script.js"></script>
+  <script>
+    const overlay = document.getElementById('starsOverlay');
+    for (let i = 0; i < 50; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
+      overlay.appendChild(s);
+    }
+  </script>
+</body>
+</html>

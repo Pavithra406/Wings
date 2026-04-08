@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .welcome-banner { background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(79,70,229,0.1)); border: 1px solid rgba(124,58,237,0.25); border-radius: 20px; padding: 24px 28px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .welcome-banner h1 { margin: 0; font-size: 1.5rem; }
+    .welcome-banner p { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .room-badge { background: rgba(124,58,237,0.25); border: 1px solid rgba(196,181,253,0.3); border-radius: 14px; padding: 12px 20px; text-align: center; }
+    .room-badge .room-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+    .room-badge .room-num { font-size: 1.4rem; font-weight: 700; color: #c4b5fd; font-family: 'Cinzel', serif; }
+    .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0 0 16px; }
+  </style>
+</head>
+<body data-page="student-dashboard">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <p class="eyebrow"></p>
+        <h2 style="margin:0;font-size:1.1rem;">Student Wing</h2>
+      </div>
+      <nav class="nav-links">
+        <a href="dashboard.html" class="active"><span class="nav-icon">🏠</span> Dashboard</a>
+        <a href="mess-menu.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="complaint.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="leave.html"><span class="nav-icon">🗓</span> Leave</a>
+        <a href="roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="holidays.html"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="feedback.html"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a>
+      </div>
+    </aside>
+    <main class="content-area">
+      <div class="welcome-banner">
+        <div>
+          <p class="eyebrow">Resident Dashboard</p>
+          <h1 id="studentGreeting">Welcome back</h1>
+          <p>Manage your hostel life from one place.</p>
+        </div>
+        <div class="room-badge">
+          <div class="room-label">Room</div>
+          <div class="room-num" id="studentRoom">—</div>
+        </div>
+      </div>
+      <p class="section-label">Quick Access</p>
+      <section class="feature-grid">
+        <a class="feature-card" href="mess-menu.html">
+          <div class="card-icon">🍽</div>
+          <h3>Mess Menu</h3>
+          <p>Check the full weekly dining schedule at a glance.</p>
+        </a>
+        <a class="feature-card" href="complaint.html">
+          <div class="card-icon">🛠</div>
+          <h3>Complaints</h3>
+          <p>Report hostel issues and track their resolution status.</p>
+        </a>
+        <a class="feature-card" href="gatepass.html">
+          <div class="card-icon">🚪</div>
+          <h3>Gate Pass</h3>
+          <p>Submit exit requests with parent verification flow.</p>
+        </a>
+        <a class="feature-card" href="leave.html">
+          <div class="card-icon">🗓</div>
+          <h3>Leave Requests</h3>
+          <p>Apply for leave and review your request history.</p>
+        </a>
+        <a class="feature-card" href="roomswap.html">
+          <div class="card-icon">🛏</div>
+          <h3>Room Swap</h3>
+          <p>Request a room change with reason tracking.</p>
+        </a>
+        <a class="feature-card" href="holidays.html">
+          <div class="card-icon">📅</div>
+          <h3>College Holidays</h3>
+          <p>View upcoming holidays and institutional events.</p>
+        </a>
+        <a class="feature-card" href="feedback.html">
+          <div class="card-icon">⭐</div>
+          <h3>Food Feedback</h3>
+          <p>Rate meals and share comments with the mess team.</p>
+        </a>
+      </section>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>

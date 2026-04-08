@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Food Feedback </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body data-page="admin-feedback">
+  <div class="app-layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><p class="eyebrow"></p><h2 style="margin:0;font-size:1.1rem;">Warden Console</h2></div>
+      <nav class="nav-links">
+        <a href="admin.html"><span class="nav-icon">📊</span> Dashboard</a>
+        <a href="admin-mess.html"><span class="nav-icon">🍽</span> Mess Menu</a>
+        <a href="admin-complaints.html"><span class="nav-icon">🛠</span> Complaints</a>
+        <a href="admin-gatepass.html"><span class="nav-icon">🚪</span> Gate Pass</a>
+        <a href="admin-leave.html"><span class="nav-icon">🗓</span> Leave Requests</a>
+        <a href="admin-roomswap.html"><span class="nav-icon">🛏</span> Room Swap</a>
+        <a href="admin-holidays.html"><span class="nav-icon">📅</span> Holidays</a>
+        <a href="admin-feedback.html" class="active"><span class="nav-icon">⭐</span> Food Feedback</a>
+      </nav>
+      <div class="sidebar-footer"><a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a></div>
+    </aside>
+    <main class="content-area">
+      <header class="page-header">
+        <div><p class="eyebrow">Mess Review</p><h1>Student Food Feedback</h1></div>
+        <div class="pill">⭐ All Reviews</div>
+      </header>
+      <section class="panel">
+        <div id="adminFeedbackList" class="feed-list"></div>
+      </section>
+    </main>
+  </div>
+  <script src="js/script.js"></script>
+</body>
+</html>

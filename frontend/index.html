@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hostel Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .landing-shell { position: relative; z-index: 1; }
+    .landing-title { font-size: clamp(1.8rem, 5vw, 3rem); margin: 0 0 8px; background: linear-gradient(135deg, #e5e7eb, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .door-ornament { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 60%; height: 2px; background: linear-gradient(90deg, transparent, rgba(196,181,253,0.4), transparent); }
+    .door-glow { position: absolute; inset: 0; border-radius: 210px 210px 24px 24px; background: radial-gradient(ellipse at 50% 30%, rgba(124,58,237,0.15), transparent 70%); pointer-events: none; }
+    .move-in-btn { font-size: 1rem; padding: 14px 36px; letter-spacing: 0.05em; }
+    .landing-meta { margin-top: 20px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+    .landing-meta span { color: var(--muted); font-size: 0.82rem; display: flex; align-items: center; gap: 6px; }
+    .landing-meta span::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  </style>
+</head>
+<body data-page="landing">
+  <div class="stars-overlay" id="starsOverlay"></div>
+  <main class="landing-shell">
+    <p class="eyebrow">Smart Hostel Management System</p>
+    <h1 class="landing-title">Hostel Portal</h1>
+    <p class="landing-subtitle">Enter the residence management system</p>
+    <section class="door-frame">
+      <div class="door" id="portalDoor">
+        <div class="door-arch">
+          <div class="door-ornament"></div>
+          <div class="door-glow"></div>
+        </div>
+        <div class="door-panel left"></div>
+        <div class="door-panel right"></div>
+        <div class="door-center">
+          <div class="lock-icon">🔐</div>
+          <button id="moveInBtn" class="primary-btn move-in-btn">Move In</button>
+        </div>
+      </div>
+    </section>
+    <div class="landing-meta">
+      <span>Student Portal</span>
+      <span>Admin Console</span>
+      <span>Parent Approval</span>
+    </div>
+  </main>
+  <script src="js/script.js"></script>
+  <script>
+    // Generate twinkling stars
+    const overlay = document.getElementById('starsOverlay');
+    for (let i = 0; i < 80; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;opacity:${0.2+Math.random()*0.6}`;
+      overlay.appendChild(s);
+    }
+  </script>
+</body>
+</html>
