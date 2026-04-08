@@ -1,6 +1,5 @@
 # Smart Hostel Management System
-
-Nevermore-inspired hostel management system built with HTML, CSS, JavaScript, and Node.js/Express.
+Hostel management system built with HTML, CSS, JavaScript, and Node.js/Express.
 
 ## Features
 
