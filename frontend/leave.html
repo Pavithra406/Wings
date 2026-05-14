@@ -31,8 +31,8 @@
         <h1>Request Leave</h1>
         <p class="panel-note">Leave requires both parent confirmation and admin approval before it is granted.</p>
         <form id="leaveForm" class="stack-form">
-          <label><span>Student Name</span><input type="text" name="studentName" placeholder="Full name" required></label>
-          <label><span>Room Number</span><input type="text" name="roomNumber" placeholder="e.g. A-204" required></label>
+          <label><span>Student Name</span><input type="text" name="studentName" id="lStudentName" placeholder="Auto-filled" readonly style="opacity:0.7;cursor:not-allowed;"></label>
+          <label><span>Room Number</span><input type="text" name="roomNumber" id="lRoomNumber" placeholder="Auto-filled" readonly style="opacity:0.7;cursor:not-allowed;"></label>
           <label><span>Leave From Date</span><input type="date" name="fromDate" required></label>
           <label><span>Leave To Date</span><input type="date" name="toDate" required></label>
           <label><span>Reason</span><textarea name="reason" rows="4" placeholder="Reason for leave..." required></textarea></label>

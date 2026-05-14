@@ -9,13 +9,70 @@
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
   <style>
-    .welcome-banner { background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(79,70,229,0.1)); border: 1px solid rgba(124,58,237,0.25); border-radius: 20px; padding: 24px 28px; margin-bottom: 28px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    /* ── Welcome banner ── */
+    .welcome-banner {
+      background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(79,70,229,0.1));
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 20px;
+      padding: 24px 28px;
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
     .welcome-banner h1 { margin: 0; font-size: 1.5rem; }
-    .welcome-banner p { margin: 4px 0 0; color: var(--muted); font-size: 0.9rem; }
-    .room-badge { background: rgba(124,58,237,0.25); border: 1px solid rgba(196,181,253,0.3); border-radius: 14px; padding: 12px 20px; text-align: center; }
-    .room-badge .room-label { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
-    .room-badge .room-num { font-size: 1.4rem; font-weight: 700; color: #c4b5fd; font-family: 'Cinzel', serif; }
-    .section-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin: 0 0 16px; }
+    .welcome-banner > div > p { margin: 6px 0 0; color: var(--muted); font-size: 0.9rem; }
+    .room-badge {
+      background: rgba(124,58,237,0.25);
+      border: 1px solid rgba(196,181,253,0.3);
+      border-radius: 14px;
+      padding: 14px 22px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .room-badge .room-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+    .room-badge .room-num  { font-size: 1.5rem; font-weight: 700; color: #c4b5fd; font-family: 'Cinzel', serif; }
+
+    /* ── Section label ── */
+    .section-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); margin: 0 0 16px; }
+
+    /* ── Feature grid — uniform card height ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 18px;
+      align-items: stretch;
+    }
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 22px;
+      min-height: 170px;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(17,24,39,0.92), rgba(11,15,28,0.9));
+      text-decoration: none;
+      color: var(--text);
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(124,58,237,0.4);
+      box-shadow: 0 20px 50px rgba(124,58,237,0.18);
+    }
+    .feature-card .card-icon {
+      width: 48px; height: 48px;
+      border-radius: 14px;
+      background: rgba(124,58,237,0.18);
+      display: grid; place-items: center;
+      font-size: 1.4rem;
+      flex-shrink: 0;
+    }
+    .feature-card h3 { margin: 0; font-size: 1rem; }
+    .feature-card p  { margin: 0; color: var(--muted); font-size: 0.84rem; line-height: 1.5; flex: 1; }
   </style>
 </head>
 <body data-page="student-dashboard">
@@ -39,7 +96,9 @@
         <a href="login.html" class="action-btn secondary-btn" style="width:100%;justify-content:center;border-radius:14px;">🚪 Logout</a>
       </div>
     </aside>
+
     <main class="content-area">
+      <!-- Welcome Banner -->
       <div class="welcome-banner">
         <div>
           <p class="eyebrow">Resident Dashboard</p>
@@ -51,6 +110,8 @@
           <div class="room-num" id="studentRoom">—</div>
         </div>
       </div>
+
+      <!-- Quick Access Cards -->
       <p class="section-label">Quick Access</p>
       <section class="feature-grid">
         <a class="feature-card" href="mess-menu.html">

@@ -17,6 +17,30 @@
     .landing-meta { margin-top: 20px; display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
     .landing-meta span { color: var(--muted); font-size: 0.82rem; display: flex; align-items: center; gap: 6px; }
     .landing-meta span::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); display: inline-block; }
+    /* Block selection overlay inside door */
+    .block-select-wrap { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 16px; padding: 20px; }
+    .block-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; }
+    .block-btn {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 18px 12px; border-radius: 18px;
+      border: 1px solid rgba(196,181,253,0.25);
+      background: rgba(124,58,237,0.12);
+      color: var(--text); cursor: pointer;
+      font-family: 'Manrope', sans-serif;
+      transition: all 0.2s ease;
+    }
+    .block-btn:hover { background: rgba(124,58,237,0.28); border-color: rgba(196,181,253,0.55); transform: translateY(-3px); box-shadow: 0 10px 28px rgba(124,58,237,0.3); }
+    .block-btn .b-icon { font-size: 1.6rem; }
+    .block-btn .b-code { font-family: 'Cinzel', serif; font-size: 1.1rem; font-weight: 700; color: #c4b5fd; }
+    .block-btn .b-label { font-size: 0.68rem; color: var(--muted); }
+    .block-select-title { font-size: 0.82rem; color: var(--muted); text-align: center; }
+    /* Confirm step */
+    .block-confirm { display: none; flex-direction: column; align-items: center; gap: 12px; }
+    .selected-block-badge { font-family: 'Cinzel', serif; font-size: 1.3rem; color: #c4b5fd; background: rgba(124,58,237,0.2); border: 1px solid rgba(196,181,253,0.3); border-radius: 14px; padding: 10px 24px; }
+    /* Admin link */
+    .admin-login-link { margin-top: 14px; font-size: 0.8rem; color: var(--muted); display: flex; align-items: center; gap: 6px; justify-content: center; }
+    .admin-login-link a { color: #c4b5fd; text-decoration: none; font-weight: 600; }
+    .admin-login-link a:hover { text-decoration: underline; }
   </style>
 </head>
 <body data-page="landing">
@@ -24,7 +48,7 @@
   <main class="landing-shell">
     <p class="eyebrow">Smart Hostel Management System</p>
     <h1 class="landing-title">Hostel Portal</h1>
-    <p class="landing-subtitle">Enter the residence management system</p>
+    <p class="landing-subtitle" id="landingSubtitle">Enter through the door to select your block</p>
     <section class="door-frame">
       <div class="door" id="portalDoor">
         <div class="door-arch">
@@ -34,8 +58,25 @@
         <div class="door-panel left"></div>
         <div class="door-panel right"></div>
         <div class="door-center">
-          <div class="lock-icon">🔐</div>
-          <button id="moveInBtn" class="primary-btn move-in-btn">Move In</button>
+          <!-- Step 1: block selection -->
+          <div class="block-select-wrap" id="blockSelectStep">
+            <div class="lock-icon">🏰</div>
+            <p class="block-select-title">Select your hostel block</p>
+            <div class="block-grid">
+              <button class="block-btn" data-block="GH1"><span class="b-icon">🏢</span><span class="b-code">GH1</span><span class="b-label">Girls Hostel 1</span></button>
+              <button class="block-btn" data-block="GH2"><span class="b-icon">🏢</span><span class="b-code">GH2</span><span class="b-label">Girls Hostel 2</span></button>
+              <button class="block-btn" data-block="BH1"><span class="b-icon">🏗</span><span class="b-code">BH1</span><span class="b-label">Boys Hostel 1</span></button>
+              <button class="block-btn" data-block="BH2"><span class="b-icon">🏗</span><span class="b-code">BH2</span><span class="b-label">Boys Hostel 2</span></button>
+            </div>
+            <div class="admin-login-link">🔑 Warden? <a href="login.html" id="adminDirectLink">Admin Login →</a></div>
+          </div>
+          <!-- Step 2: confirm & enter -->
+          <div class="block-confirm" id="blockConfirmStep">
+            <div class="lock-icon">🔐</div>
+            <div class="selected-block-badge" id="selectedBlockBadge">GH1</div>
+            <button id="moveInBtn" class="primary-btn move-in-btn">Enter Block</button>
+            <button id="changeBlockBtn" style="background:none;border:none;color:var(--muted);font-size:0.8rem;cursor:pointer;font-family:'Manrope',sans-serif;">← Change Block</button>
+          </div>
         </div>
       </div>
     </section>
@@ -47,7 +88,7 @@
   </main>
   <script src="js/script.js"></script>
   <script>
-    // Generate twinkling stars
+    // Stars
     const overlay = document.getElementById('starsOverlay');
     for (let i = 0; i < 80; i++) {
       const s = document.createElement('div');
@@ -55,6 +96,27 @@
       s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;width:${1+Math.random()*2}px;height:${1+Math.random()*2}px;opacity:${0.2+Math.random()*0.6}`;
       overlay.appendChild(s);
     }
+    // Block selection
+    document.querySelectorAll('.block-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const block = btn.dataset.block;
+        localStorage.setItem('selectedBlock', block);
+        document.getElementById('selectedBlockBadge').textContent = block;
+        document.getElementById('blockSelectStep').style.display = 'none';
+        const confirm = document.getElementById('blockConfirmStep');
+        confirm.style.display = 'flex';
+        document.getElementById('landingSubtitle').textContent = `Block ${block} selected — ready to enter`;
+      });
+    });
+    document.getElementById('changeBlockBtn').addEventListener('click', () => {
+      document.getElementById('blockSelectStep').style.display = '';
+      document.getElementById('blockConfirmStep').style.display = 'none';
+      document.getElementById('landingSubtitle').textContent = 'Enter through the door to select your block';
+    });
+    // Admin direct login — clear block so backend skips block check
+    document.getElementById('adminDirectLink').addEventListener('click', () => {
+      localStorage.removeItem('selectedBlock');
+    });
   </script>
 </body>
 </html>

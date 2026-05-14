@@ -31,7 +31,7 @@
         <h1>Room Swap</h1>
         <p class="panel-note">Submit a room change request. Admin will review and approve based on availability.</p>
         <form id="roomSwapForm" class="stack-form">
-          <label><span>Current Room Number</span><input type="text" name="currentRoomNumber" placeholder="e.g. A-204" required></label>
+          <label><span>Current Room Number</span><input type="text" name="currentRoomNumber" id="rsCurrentRoom" placeholder="Auto-filled" readonly style="opacity:0.7;cursor:not-allowed;"></label>
           <label><span>Requested Room Number</span><input type="text" name="requestedRoomNumber" placeholder="e.g. B-101" required></label>
           <label><span>Reason for Swap</span><textarea name="reason" rows="4" placeholder="Why do you want to change rooms?" required></textarea></label>
           <button type="submit" class="primary-btn" style="justify-content:center;">🛏 Send Request</button>

@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const QRCode = require("qrcode");
 const multer = require("multer");
 const XLSX = require("xlsx");
+const nodemailer = require("nodemailer");
 
 loadEnvFile(path.join(__dirname, ".env"));
 
@@ -158,12 +159,16 @@ const callService = {
 
 /* ── Auth ── */
 app.post("/api/login", (req, res) => {
-  const { userId, password } = req.body;
+  const { userId, password, selectedBlock } = req.body;
   const store = readStore();
   const user = [...store.students, ...store.admins].find(
     (e) => e.userId === userId && e.password === password
   );
   if (!user) return res.status(401).json({ message: "Invalid credentials" });
+  // Block check: students must match selected block; admins bypass
+  if (user.role === "student" && selectedBlock && user.block && user.block !== selectedBlock) {
+    return res.status(401).json({ message: `You are not registered in block ${selectedBlock}` });
+  }
   return res.json({ message: "Login successful", role: user.role, user: sanitizeUser(user) });
 });
 
@@ -196,11 +201,13 @@ function generatePassword() {
 }
 
 /* ── Excel Users Upload (students + admins) ── */
+const VALID_BLOCKS = ["GH1", "GH2", "BH1", "BH2"];
+
 app.post("/api/users/upload", upload.single("usersFile"), (req, res) => {
   if (!req.file) return res.status(400).json({ message: "No file uploaded" });
 
   const summary = {
-    students: { created: 0, updated: 0, skipped: 0 },
+    students: { created: 0, updated: 0, skipped: 0, skippedRows: [] },
     admins:   { created: 0, updated: 0, skipped: 0 },
   };
 
@@ -218,13 +225,16 @@ app.post("/api/users/upload", upload.single("usersFile"), (req, res) => {
         const k = keys.find(k => k.toLowerCase().trim() === name.toLowerCase());
         return k ? String(row[k]).trim() : "";
       };
+      const has = (name) => keys.some(k => k.toLowerCase().trim() === name.toLowerCase());
 
-      const userId   = get("userId");
-      const role     = get("role").toLowerCase();
-      const name     = get("name");
-      const password = get("password") || generatePassword();
+      const userId      = get("userId");
+      const role        = get("role").toLowerCase();
+      const name        = get("name");
+      const password    = get("password") || generatePassword();
       const roomNumber  = get("roomNumber");
+      const block       = get("block");
       const parentPhone = get("parentPhone");
+      const parentEmail = get("parentEmail");
 
       if (!userId) continue;
       if (role !== "student" && role !== "admin") continue;
@@ -232,16 +242,23 @@ app.post("/api/users/upload", upload.single("usersFile"), (req, res) => {
       processable++;
 
       if (role === "student") {
+        if (has("block") && block !== "" && !VALID_BLOCKS.includes(block)) {
+          summary.students.skipped++;
+          summary.students.skippedRows.push({ userId, reason: "Invalid block value." });
+          continue;
+        }
         const idx = store.students.findIndex(s => s.userId === userId);
+        const updates = { name, password, roomNumber, parentPhone };
+        if (has("block") && block !== "") updates.block = block;
+        if (has("parentEmail") && parentEmail !== "") updates.parentEmail = parentEmail;
         if (idx === -1) {
-          store.students.push({ userId, password, role: "student", name, roomNumber, parentPhone });
+          store.students.push({ userId, role: "student", ...updates });
           summary.students.created++;
         } else {
-          Object.assign(store.students[idx], { name, password, roomNumber, parentPhone });
+          Object.assign(store.students[idx], updates);
           summary.students.updated++;
         }
       } else {
-        // admin — strip student-only fields
         const idx = store.admins.findIndex(a => a.userId === userId);
         if (idx === -1) {
           store.admins.push({ userId, password, role: "admin", name });
@@ -258,10 +275,7 @@ app.post("/api/users/upload", upload.single("usersFile"), (req, res) => {
     }
 
     writeStore(store);
-    res.json({
-      message: "Upload complete.",
-      summary,
-    });
+    res.json({ message: "Upload complete.", summary });
   } catch (err) {
     res.status(500).json({ message: "Failed to parse Excel file: " + err.message });
   } finally {
@@ -330,10 +344,15 @@ app.post("/api/complaints", (req, res) => {
   const store = readStore();
   const complaint = {
     id: nextId("CMP", store.complaints),
+    studentName: req.body.studentName || "",
     roomNumber: req.body.roomNumber,
     complaintType: req.body.complaintType,
     issueDescription: req.body.issueDescription,
+    priority: Number(req.body.priority) || 3,
     status: "Pending",
+    resolved: false,
+    assuranceDate: null,
+    escalated: false,
     createdAt: new Date().toISOString(),
   };
   store.complaints.unshift(complaint);
@@ -345,7 +364,9 @@ app.patch("/api/complaints/:id", (req, res) => {
   const store = readStore();
   const item = store.complaints.find((c) => c.id === req.params.id);
   if (!item) return res.status(404).json({ message: "Complaint not found" });
-  item.status = req.body.status || item.status;
+  if (req.body.status !== undefined) item.status = req.body.status;
+  if (req.body.assuranceDate !== undefined) item.assuranceDate = req.body.assuranceDate;
+  if (item.status === "Resolved") item.resolved = true;
   writeStore(store);
   res.json({ message: "Complaint updated", complaint: item });
 });
@@ -705,4 +726,155 @@ app.get("/api/admin/overview", (req, res) => {
 
 app.get("/", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "index.html")));
 
+/* ══════════════════════════════════════════════════════════════
+   EXPORT ROUTES
+══════════════════════════════════════════════════════════════ */
+
+/* helper — build xlsx buffer from array of objects */
+function buildXlsx(sheetsMap) {
+  const wb = XLSX.utils.book_new();
+  for (const [name, rows] of Object.entries(sheetsMap)) {
+    const ws = XLSX.utils.json_to_sheet(rows.length ? rows : [{}]);
+    XLSX.utils.book_append_sheet(wb, ws, name.slice(0, 31));
+  }
+  return XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
+}
+
+function sendXlsx(res, filename, sheetsMap) {
+  const buf = buildXlsx(sheetsMap);
+  res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+  res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
+  res.send(buf);
+}
+
+/* GET /api/export/users */
+app.get("/api/export/users", (req, res) => {
+  const store = readStore();
+  const rows = store.students.map(s => ({
+    "User ID": s.userId,
+    "Name": s.name,
+    "Role": s.role,
+    "Room Number": s.roomNumber || "",
+    "Block": s.block || "",
+    "Parent Phone": s.parentPhone || "",
+    "Parent Email": s.parentEmail || "",
+  }));
+  sendXlsx(res, "users.xlsx", { "Students": rows });
+});
+
+/* GET /api/export/complaints */
+app.get("/api/export/complaints", (req, res) => {
+  const store = readStore();
+  const rows = store.complaints.map(c => ({
+    "ID": c.id,
+    "Student Name": c.studentName || "",
+    "Room": c.roomNumber,
+    "Type": c.complaintType,
+    "Description": c.issueDescription,
+    "Priority": c.priority || "",
+    "Status": c.status,
+    "Assurance Date": c.assuranceDate || "",
+    "Escalated": c.escalated ? "Yes" : "No",
+    "Created At": c.createdAt,
+  }));
+  sendXlsx(res, "complaints.xlsx", { "Complaints": rows });
+});
+
+/* GET /api/export/gatepass */
+app.get("/api/export/gatepass", (req, res) => {
+  const store = readStore();
+  const rows = store.gatePasses.map(g => ({
+    "ID": g.id,
+    "Student Name": g.studentName,
+    "Room": g.roomNumber,
+    "Out Time": g.outTime,
+    "Return Time": g.returnTime,
+    "Reason": g.reason,
+    "Parent Phone": g.parentPhone || "",
+    "Parent Approval": g.parentApproval,
+    "Admin Approval": g.adminApproval,
+    "Status": g.status,
+    "Created At": g.createdAt,
+  }));
+  sendXlsx(res, "gatepass.xlsx", { "Gate Passes": rows });
+});
+
+/* GET /api/export/full-report */
+app.get("/api/export/full-report", (req, res) => {
+  const store = readStore();
+  const students = store.students.map(s => ({
+    "User ID": s.userId, "Name": s.name, "Room": s.roomNumber || "",
+    "Block": s.block || "", "Parent Phone": s.parentPhone || "", "Parent Email": s.parentEmail || "",
+  }));
+  const complaints = store.complaints.map(c => ({
+    "ID": c.id, "Student": c.studentName || "", "Room": c.roomNumber,
+    "Type": c.complaintType, "Priority": c.priority || "", "Status": c.status,
+    "Assurance Date": c.assuranceDate || "", "Created": c.createdAt,
+  }));
+  const gatePasses = store.gatePasses.map(g => ({
+    "ID": g.id, "Student": g.studentName, "Room": g.roomNumber,
+    "Out": g.outTime, "Return": g.returnTime, "Status": g.status, "Created": g.createdAt,
+  }));
+  const leaves = store.leaveRequests.map(l => ({
+    "ID": l.id, "Student": l.studentName, "Room": l.roomNumber,
+    "From": l.fromDate, "To": l.toDate, "Reason": l.reason,
+    "Parent": l.parentApproval, "Admin": l.adminApproval, "Status": l.status,
+  }));
+  const roomSwaps = store.roomSwaps.map(r => ({
+    "ID": r.id, "From Room": r.currentRoomNumber, "To Room": r.requestedRoomNumber,
+    "Reason": r.reason, "Status": r.status,
+  }));
+  const feedback = store.feedback.map(f => ({
+    "ID": f.id, "Rating": f.rating, "Comment": f.comment, "Date": f.createdAt,
+  }));
+  sendXlsx(res, "full-report.xlsx", {
+    "Students": students,
+    "Complaints": complaints,
+    "Gate Passes": gatePasses,
+    "Leave Requests": leaves,
+    "Room Swaps": roomSwaps,
+    "Feedback": feedback,
+  });
+});
+
+/* GET /api/users — for dashboard modal */
+app.get("/api/users", (req, res) => {
+  const store = readStore();
+  res.json(store.students.map(s => sanitizeUser(s)));
+});
+
+/* ── Mailer ── */
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT) || 587,
+  auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS },
+});
+
 app.listen(PORT, () => console.log(`Smart Hostel server running on http://localhost:${PORT}`));
+
+/* ── Escalation job ── */
+const cron = require("node-cron");
+cron.schedule("0 * * * *", async () => {
+  const escalationEmail = process.env.ESCALATION_EMAIL;
+  if (!escalationEmail) return;
+  const store = readStore();
+  const now = new Date();
+  let changed = false;
+  for (const c of store.complaints) {
+    if (c.status !== "Resolved" && c.assuranceDate && new Date(c.assuranceDate) < now && !c.escalated) {
+      try {
+        await transporter.sendMail({
+          from: process.env.SMTP_USER,
+          to: escalationEmail,
+          subject: `[Escalation] Complaint ${c.id} overdue`,
+          text: `Complaint ID: ${c.id}\nType: ${c.complaintType}\nRoom: ${c.roomNumber}\nDescription: ${c.issueDescription}\nAssurance Date (missed): ${c.assuranceDate}`,
+        });
+        c.escalated = true;
+        changed = true;
+      } catch (err) {
+        console.error("[Escalation] Failed for", c.id, err.message);
+      }
+    }
+  }
+  if (changed) writeStore(store);
+});

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Response Recorded</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .confirm-card { text-align: center; padding: 48px 32px; }
+    .confirm-icon { font-size: 4rem; margin-bottom: 16px; }
+    .confirm-title { font-size: 1.8rem; margin-bottom: 8px; }
+    .confirm-sub { color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+  </style>
+</head>
+<body data-page="confirm">
+  <div class="stars-overlay" id="starsOverlay"></div>
+  <main class="auth-shell">
+    <section class="auth-card confirm-card fade-in">
+      <p class="eyebrow">Hostel Portal</p>
+      <div class="confirm-icon" id="confirmIcon">✅</div>
+      <h1 class="confirm-title" id="confirmTitle">Response Recorded</h1>
+      <p class="confirm-sub" id="confirmSub">Your response has been saved. The hostel administration has been notified.</p>
+      <p style="margin-top:24px;font-size:0.85rem;color:var(--muted);">You may close this window.</p>
+    </section>
+  </main>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const result = params.get('result');
+    if (result === 'approved') {
+      document.getElementById('confirmIcon').textContent = '✅';
+      document.getElementById('confirmTitle').textContent = 'Request Approved';
+      document.getElementById('confirmSub').textContent = 'You have approved the request. The hostel administration has been notified.';
+    } else if (result === 'rejected') {
+      document.getElementById('confirmIcon').textContent = '❌';
+      document.getElementById('confirmTitle').textContent = 'Request Rejected';
+      document.getElementById('confirmSub').textContent = 'You have rejected the request. The hostel administration has been notified.';
+    }
+    const overlay = document.getElementById('starsOverlay');
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;`;
+      overlay.appendChild(s);
+    }
+  </script>
+</body>
+</html>

@@ -6,7 +6,9 @@
       "role": "student",
       "name": "Aarav D'Souza",
       "roomNumber": "A-204",
-      "parentPhone": "+919876543210"
+      "block": "GH1",
+      "parentPhone": "+919876543210",
+      "parentEmail": "parent.aarav@example.com"
     },
     {
       "userId": "STU1002",
@@ -14,7 +16,9 @@
       "role": "student",
       "name": "Pavithra",
       "roomNumber": "28",
-      "parentPhone": "6380044904"
+      "block": "GH1",
+      "parentPhone": "6380044904",
+      "parentEmail": "parent.pavithra@example.com"
     },
     {
       "userId": "STU1003",
@@ -22,7 +26,9 @@
       "role": "student",
       "name": "Subitha",
       "roomNumber": "29",
-      "parentPhone": "8807149866"
+      "block": "GH1",
+      "parentPhone": "8807149866",
+      "parentEmail": "parent.subitha@example.com"
     },
     {
       "userId": "205119",
@@ -30,7 +36,9 @@
       "role": "student",
       "name": "Pavithra",
       "roomNumber": "28",
-      "parentPhone": "6380044904"
+      "block": "GH1",
+      "parentPhone": "6380044904",
+      "parentEmail": "parent.pavithra@example.com"
     },
     {
       "userId": "205159",
@@ -38,7 +46,9 @@
       "role": "student",
       "name": "Subitha",
       "roomNumber": "29",
-      "parentPhone": "8807149866"
+      "block": "GH1",
+      "parentPhone": "8807149866",
+      "parentEmail": "parent.subitha@example.com"
     }
   ],
   "admins": [
@@ -95,6 +105,23 @@
   ],
   "complaints": [
     {
+      "id": "CMP004",
+      "roomNumber": "101",
+      "complaintType": "Electrical",
+      "issueDescription": "mm",
+      "status": "Pending",
+      "createdAt": "2026-04-09T08:27:36.557Z",
+      "assuranceDate": "2026-04-15"
+    },
+    {
+      "id": "CMP003",
+      "roomNumber": "126",
+      "complaintType": "Water",
+      "issueDescription": "water leakage",
+      "status": "In Progress",
+      "createdAt": "2026-04-09T08:26:17.527Z"
+    },
+    {
       "id": "CMP002",
       "roomNumber": "101",
       "complaintType": "Water",
@@ -122,13 +149,13 @@
       "parentPhone": "8807149866",
       "status": "Pending",
       "parentApproval": "Approved",
-      "parentVerification": "Accepted",
+      "parentVerification": "Call Initiated",
       "adminApproval": "Pending",
       "approvalToken": "b64cdf121503f93518b99181b32e91c6",
       "approvalLink": "http://localhost:3000/parent-approval.html?type=gatepass&token=b64cdf121503f93518b99181b32e91c6",
       "qrCode": "",
       "createdAt": "2026-04-06T06:15:44.096Z",
-      "callSid": "SIM-1775559135301",
+      "callSid": "SIM-1775811814548",
       "callMode": "simulation"
     },
     {
@@ -187,6 +214,38 @@
   ],
   "leaveRequests": [
     {
+      "id": "LV003",
+      "studentName": "pavithra",
+      "roomNumber": "28",
+      "fromDate": "2026-04-10",
+      "toDate": "2026-04-11",
+      "reason": "feaver",
+      "parentPhone": "6380044904",
+      "status": "Pending",
+      "parentApproval": "Pending",
+      "adminApproval": "Pending",
+      "approvalToken": "797d2bcbaf5d646c98a1802f9d6d3fb3",
+      "approvalLink": "http://localhost:3000/parent-approval.html?type=leave&token=797d2bcbaf5d646c98a1802f9d6d3fb3",
+      "createdAt": "2026-04-09T09:11:15.769Z",
+      "parentVerification": "Pending"
+    },
+    {
+      "id": "LV002",
+      "studentName": "bbjj",
+      "roomNumber": "89",
+      "fromDate": "2026-04-05",
+      "toDate": "20026-05-05",
+      "reason": "kgoug",
+      "parentPhone": "",
+      "status": "Pending",
+      "parentApproval": "Pending",
+      "adminApproval": "Pending",
+      "approvalToken": "ce279af131545ed2872d63e4e6688664",
+      "approvalLink": "http://localhost:3000/parent-approval.html?type=leave&token=ce279af131545ed2872d63e4e6688664",
+      "createdAt": "2026-04-09T08:28:45.403Z",
+      "parentVerification": "Pending"
+    },
+    {
       "id": "LV001",
       "studentName": "Aarav D'Souza",
       "roomNumber": "A-204",
@@ -213,6 +272,12 @@
     }
   ],
   "feedback": [
+    {
+      "id": "FDB003",
+      "rating": 3,
+      "comment": "ok",
+      "createdAt": "2026-04-09T08:27:22.451Z"
+    },
     {
       "id": "FDB002",
       "rating": 5,

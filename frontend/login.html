@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Hostel Portal</title>
+  <title>Login — Hostel Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -15,6 +15,8 @@
     .login-title { font-size: 1.8rem; margin-bottom: 4px; background: linear-gradient(135deg, #e5e7eb, #c4b5fd); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
     .back-link { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; transition: color 0.2s; }
     .back-link:hover { color: #c4b5fd; }
+    .block-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border-radius: 999px; background: rgba(124,58,237,0.18); border: 1px solid rgba(196,181,253,0.25); margin-bottom: 16px; font-size: 0.85rem; color: #c4b5fd; font-weight: 600; }
+    .block-badge a { color: var(--muted); font-size: 0.75rem; margin-left: 4px; }
     .demo-box strong { color: var(--text); }
   </style>
 </head>
@@ -26,8 +28,10 @@
       <div class="login-logo">🏰</div>
       <p class="eyebrow">Resident Access</p>
       <h1 class="login-title">Enter</h1>
+      <div class="block-badge">🏢 <span id="blockBadgeText">No block selected</span> <a href="index.html">change</a></div>
       <p class="auth-copy">Credentials are issued by hostel administration. Contact the warden if you need access.</p>
       <form id="loginForm" class="stack-form">
+        <input type="hidden" name="selectedBlock" id="selectedBlockInput">
         <label>
           <span>User ID</span>
           <input type="text" name="userId" placeholder="STU1001" autocomplete="username" required>
@@ -40,8 +44,8 @@
       </form>
       <div class="demo-box">
         <p style="font-weight:600;color:#c4b5fd;margin-bottom:8px;">Demo Credentials</p>
-        <p>Student: <strong>STU1001</strong> / <strong>nevermore123</strong></p>
-        <p>Admin: <strong>ADMIN01</strong> / <strong>ravens@123</strong></p>
+        <p>Student (Block GH1): <strong>STU1001</strong> / <strong>nevermore123</strong></p>
+        <p>Admin (any block): <strong>ADMIN01</strong> / <strong>ravens@123</strong></p>
       </div>
       <p id="loginMessage" class="inline-message"></p>
     </section>
@@ -55,6 +59,9 @@
       s.style.cssText = `left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s;animation-duration:${2+Math.random()*3}s;`;
       overlay.appendChild(s);
     }
+    const block = localStorage.getItem('selectedBlock') || '';
+    document.getElementById('blockBadgeText').textContent = block ? 'Block ' + block : 'No block selected (admin login)';
+    document.getElementById('selectedBlockInput').value = block;
   </script>
 </body>
 </html>

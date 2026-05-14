@@ -31,18 +31,31 @@
         <h1>Complaint Management</h1>
         <p class="panel-note">Submit your complaint and track its resolution. Our maintenance team will respond promptly.</p>
         <form id="complaintForm" class="stack-form">
-          <label><span>Room Number</span><input type="text" name="roomNumber" placeholder="e.g. A-204" required></label>
+          <label><span>Student Name</span><input type="text" name="studentName" id="cStudentName" placeholder="Auto-filled" readonly style="opacity:0.7;cursor:not-allowed;"></label>
+          <label><span>Room Number</span><input type="text" name="roomNumber" id="cRoomNumber" placeholder="Auto-filled" readonly style="opacity:0.7;cursor:not-allowed;"></label>
           <label>
             <span>Complaint Type</span>
             <select name="complaintType" required>
               <option value="">Select type...</option>
               <option value="Electrical">⚡ Electrical</option>
-              <option value="Water">💧 Water</option>
+              <option value="Plumbing">🔧 Plumbing</option>
               <option value="Furniture">🪑 Furniture</option>
+              <option value="Water">💧 Water</option>
               <option value="Other">📋 Other</option>
             </select>
           </label>
-          <label><span>Issue Description</span><textarea name="issueDescription" rows="5" placeholder="Describe the issue in detail..." required></textarea></label>
+          <label>
+            <span>Priority (1 = Low, 5 = Critical)</span>
+            <select name="priority" required>
+              <option value="">Select priority...</option>
+              <option value="1">1 — Low</option>
+              <option value="2">2 — Minor</option>
+              <option value="3">3 — Moderate</option>
+              <option value="4">4 — High</option>
+              <option value="5">5 — Critical</option>
+            </select>
+          </label>
+          <label><span>Issue Description</span><textarea name="issueDescription" rows="4" placeholder="Describe the issue in detail..." required></textarea></label>
           <button type="submit" class="primary-btn" style="justify-content:center;">🛠 Submit Complaint</button>
         </form>
         <p id="complaintMessage" class="inline-message"></p>

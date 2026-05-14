@@ -74,12 +74,19 @@ async function initLanding() {
 /* ── Login ── */
 async function initLogin() {
   localStorage.removeItem("smartHostelUser");
+  // Pre-fill selectedBlock from localStorage
+  const block = localStorage.getItem("selectedBlock") || "";
+  const blockInput = document.getElementById("selectedBlockInput");
+  if (blockInput) blockInput.value = block;
+
   document.getElementById("loginForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const payload = Object.fromEntries(new FormData(e.target).entries());
+    if (!payload.selectedBlock) payload.selectedBlock = localStorage.getItem("selectedBlock") || "";
     try {
       const result = await api("/api/login", {
         method: "POST",
-        body: JSON.stringify(Object.fromEntries(new FormData(e.target).entries())),
+        body: JSON.stringify(payload),
       });
       localStorage.setItem("smartHostelUser", JSON.stringify(result.user));
       window.location.href = result.role === "admin" ? "admin.html" : "dashboard.html";
@@ -102,6 +109,19 @@ async function fillStudentHeader() {
 }
 
 async function initStudentDashboard() { await fillStudentHeader(); }
+
+/* ── Auto-fill helper ── */
+function autoFill(user) {
+  const fields = {
+    studentName: user.name, cStudentName: user.name, lStudentName: user.name,
+    roomNumber: user.roomNumber, cRoomNumber: user.roomNumber, lRoomNumber: user.roomNumber,
+    rsCurrentRoom: user.roomNumber,
+  };
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) { el.value = val; el.readOnly = true; el.style.opacity = "0.7"; el.style.cursor = "not-allowed"; }
+  });
+}
 
 /* ── Mess Menu ── */
 async function initMessMenu() {
@@ -139,19 +159,30 @@ async function initMessMenu() {
 /* ── Complaints ── */
 async function initComplaint() {
   const user = await fillStudentHeader();
+  if (user) autoFill(user);
+
   async function load() {
     const list = await api("/api/complaints");
-    document.getElementById("complaintList").innerHTML = list
-      .filter(i => !user || i.roomNumber === user.roomNumber || i.studentName === user.name)
-      .map(i => cardItem(`${i.complaintType} Complaint`, [`Room ${i.roomNumber}`, i.issueDescription], i.status))
-      .join("") || '<div class="empty-state"><div class="empty-icon">🛠</div><p>No complaints yet.</p></div>';
+    const filtered = list.filter(i => !user || i.roomNumber === user.roomNumber || i.studentName === user.name);
+    const priorityLabel = (p) => p ? ` · P${p}` : "";
+    const priorityColor = (p) => p >= 4 ? "#fda4af" : p >= 3 ? "#fbbf24" : "#6ee7b7";
+    document.getElementById("complaintList").innerHTML = filtered.map(i => `
+      <article class="feed-item">
+        <h3>${i.complaintType} Complaint</h3>
+        <p>Room ${i.roomNumber}${i.studentName ? " · " + i.studentName : ""}${i.priority ? ` · <span style="color:${priorityColor(i.priority)}">Priority ${i.priority}</span>` : ""}</p>
+        <p>${i.issueDescription}</p>
+        ${i.assuranceDate ? `<p style="font-size:0.8rem;color:var(--muted);">📅 Assurance: ${formatDate(i.assuranceDate)}</p>` : ""}
+        <span class="badge ${statusClass(i.status)}">${i.status}</span>
+      </article>`).join("") || '<div class="empty-state"><div class="empty-icon">🛠</div><p>No complaints yet.</p></div>';
   }
+
   document.getElementById("complaintForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
     try {
       const r = await api("/api/complaints", { method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(e.target).entries())) });
       setMessage("complaintMessage", r.message);
       e.target.reset();
+      if (user) autoFill(user);
       load();
     } catch (err) { setMessage("complaintMessage", err.message, true); }
   });
@@ -226,6 +257,8 @@ async function initGatePass() {
 /* ── Leave (student) ── */
 async function initLeave() {
   const user = await fillStudentHeader();
+  if (user) autoFill(user);
+
   async function load() {
     const list = await api("/api/leave");
     document.getElementById("leaveTable").innerHTML = list
@@ -242,6 +275,7 @@ async function initLeave() {
       const r = await api("/api/leave", { method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(e.target).entries())) });
       setMessage("leaveMessage", r.message);
       e.target.reset();
+      if (user) autoFill(user);
       load();
     } catch (err) { setMessage("leaveMessage", err.message, true); }
   });
@@ -250,10 +284,13 @@ async function initLeave() {
 
 /* ── Room Swap (student) ── */
 async function initRoomSwap() {
-  await fillStudentHeader();
+  const user = await fillStudentHeader();
+  if (user) autoFill(user);
+
   async function load() {
     const list = await api("/api/room-swap");
     document.getElementById("roomSwapList").innerHTML = list
+      .filter(i => !user || i.currentRoomNumber === user.roomNumber)
       .map(i => cardItem(`${i.currentRoomNumber} → ${i.requestedRoomNumber}`, [i.reason], i.status))
       .join("") || '<div class="empty-state"><div class="empty-icon">🛏</div><p>No swap requests yet.</p></div>';
   }
@@ -263,6 +300,7 @@ async function initRoomSwap() {
       const r = await api("/api/room-swap", { method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(e.target).entries())) });
       setMessage("roomSwapMessage", r.message);
       e.target.reset();
+      if (user) autoFill(user);
       load();
     } catch (err) { setMessage("roomSwapMessage", err.message, true); }
   });
@@ -382,21 +420,92 @@ function bindAdminActions(overview) {
   }, { once: true });
 }
 
+/* ── Modal helpers ── */
+function openModal(title, headers, rows) {
+  document.getElementById("modalTitle").textContent = title;
+  document.getElementById("modalThead").innerHTML = `<tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>`;
+  document.getElementById("modalTbody").innerHTML = rows.length
+    ? rows.map(r => `<tr>${r.map(c => `<td>${c ?? "—"}</td>`).join("")}</tr>`).join("")
+    : `<tr><td colspan="${headers.length}" style="text-align:center;color:var(--muted);padding:32px;">No data found.</td></tr>`;
+  document.getElementById("detailModal").classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeModal() {
+  document.getElementById("detailModal").classList.add("hidden");
+  document.body.style.overflow = "";
+}
+
 /* ── Admin Dashboard ── */
 async function initAdminDashboard() {
   const [stats, overview] = await getAdminOverview();
-  document.getElementById("statsGrid").innerHTML = [
-    ["Total Students", stats.totalStudents, "👥"],
-    ["Total Complaints", stats.totalComplaints, "🛠"],
-    ["Resolved Complaints", stats.resolvedComplaints, "✅"],
-    ["Pending Gate Pass", stats.pendingGatePass, "🚪"],
-    ["Leave Applications", stats.leaveRequests, "🗓"],
-  ].map(([title, value, icon]) => `
-    <article class="stat-card">
-      <div class="stat-icon">${icon}</div>
-      <p>${title}</p>
-      <h3>${value}</h3>
+
+  const cardDefs = [
+    {
+      title: "Total Students", value: stats.totalStudents, icon: "👥", hint: "Click to view",
+      async onClick() {
+        const users = await api("/api/users");
+        openModal("All Students",
+          ["User ID", "Name", "Room", "Block", "Parent Phone"],
+          users.map(u => [u.userId, u.name, u.roomNumber || "—", u.block || "—", u.parentPhone || "—"])
+        );
+      }
+    },
+    {
+      title: "Total Complaints", value: stats.totalComplaints, icon: "🛠", hint: "Click to view",
+      onClick() {
+        openModal("All Complaints",
+          ["ID", "Student", "Room", "Type", "Priority", "Status", "Assurance Date"],
+          overview.complaints.map(c => [c.id, c.studentName || "—", c.roomNumber, c.complaintType, c.priority || "—",
+            c.status, c.assuranceDate || "—"])
+        );
+      }
+    },
+    {
+      title: "Resolved Complaints", value: stats.resolvedComplaints, icon: "✅", hint: "Click to view",
+      onClick() {
+        const resolved = overview.complaints.filter(c => c.status === "Resolved");
+        openModal("Resolved Complaints",
+          ["ID", "Student", "Room", "Type", "Priority"],
+          resolved.map(c => [c.id, c.studentName || "—", c.roomNumber, c.complaintType, c.priority || "—"])
+        );
+      }
+    },
+    {
+      title: "Leave Applications", value: stats.leaveRequests, icon: "🗓", hint: "Click to view",
+      onClick() {
+        openModal("Leave Requests",
+          ["ID", "Student", "Room", "From", "To", "Reason", "Parent", "Status"],
+          overview.leaveRequests.map(l => [l.id, l.studentName, l.roomNumber, l.fromDate, l.toDate,
+            l.reason, l.parentApproval, l.status])
+        );
+      }
+    },
+    {
+      title: "Pending Gate Pass", value: stats.pendingGatePass, icon: "🚪", hint: "Click to view",
+      onClick() {
+        openModal("Gate Pass Requests",
+          ["ID", "Student", "Room", "Out Time", "Return", "Parent", "Admin", "Status"],
+          overview.gatePasses.map(g => [g.id, g.studentName, g.roomNumber,
+            g.outTime ? new Date(g.outTime).toLocaleString() : "—",
+            g.returnTime ? new Date(g.returnTime).toLocaleString() : "—",
+            g.parentApproval, g.adminApproval, g.status])
+        );
+      }
+    },
+  ];
+
+  document.getElementById("statsGrid").innerHTML = cardDefs.map((c, idx) => `
+    <article class="stat-card" id="statCard_${idx}" style="cursor:pointer;">
+      <div class="stat-icon">${c.icon}</div>
+      <p>${c.title}</p>
+      <h3>${c.value}</h3>
+      <div class="stat-hint">🔍 ${c.hint}</div>
     </article>`).join("");
+
+  cardDefs.forEach((c, idx) => {
+    document.getElementById(`statCard_${idx}`).addEventListener("click", c.onClick);
+  });
 
   renderChart("complaintChart", "pie",
     ["Pending", "In Progress", "Resolved"],
@@ -477,21 +586,42 @@ async function initAdminMess() {
 async function initAdminComplaints() {
   const [, overview] = await getAdminOverview();
   document.getElementById("adminComplaintList").innerHTML = overview.complaints.length
-    ? overview.complaints.map(i => `
-      <article class="feed-item">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
-          <div><h3 style="margin:0 0 4px;">${i.complaintType} Complaint</h3>
-          <p style="margin:0;font-size:0.8rem;color:var(--muted);">ID: ${i.id} · Room ${i.roomNumber}</p></div>
-          <span class="badge ${statusClass(i.status)}">${i.status}</span>
-        </div>
-        <p style="margin:12px 0 10px;font-size:0.88rem;color:var(--muted);">${i.issueDescription}</p>
-        <div class="action-row">
-          <button class="action-btn secondary-btn" data-complaint="${i.id}" data-status="In Progress">⏳ In Progress</button>
-          <button class="action-btn" data-complaint="${i.id}" data-status="Resolved">✅ Resolve</button>
-        </div>
-      </article>`).join("")
+    ? overview.complaints.map(i => {
+        const isOverdue = i.assuranceDate && new Date(i.assuranceDate) < new Date() && i.status !== "Resolved";
+        const pColor = i.priority >= 4 ? "#fda4af" : i.priority >= 3 ? "#fbbf24" : "#6ee7b7";
+        return `
+        <article class="feed-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+            <div>
+              <h3 style="margin:0 0 4px;">${i.complaintType} Complaint ${isOverdue ? '<span class="badge status-rejected" style="margin-left:6px;font-size:0.7rem;">⚠ Overdue</span>' : ""}</h3>
+              <p style="margin:0;font-size:0.8rem;color:var(--muted);">ID: ${i.id} · Room ${i.roomNumber}${i.studentName ? " · " + i.studentName : ""}${i.priority ? ` · <span style="color:${pColor}">P${i.priority}</span>` : ""}</p>
+            </div>
+            <span class="badge ${statusClass(i.status)}">${i.status}</span>
+          </div>
+          <p style="margin:10px 0 8px;font-size:0.88rem;color:var(--muted);">${i.issueDescription}</p>
+          ${i.assuranceDate ? `<p style="font-size:0.8rem;color:${isOverdue ? "#fda4af" : "var(--muted)"};margin:0 0 10px;">📅 Assurance: ${formatDate(i.assuranceDate)}</p>` : ""}
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+            <label style="font-size:0.8rem;color:var(--muted);">Set Assurance Date:</label>
+            <input type="date" id="ad_${i.id}" value="${i.assuranceDate || ""}" style="padding:6px 10px;border-radius:10px;font-size:0.8rem;width:auto;">
+            <button class="action-btn secondary-btn" style="padding:6px 12px;font-size:0.78rem;" onclick="setAssuranceDate('${i.id}')">📅 Set</button>
+          </div>
+          <div class="action-row">
+            <button class="action-btn secondary-btn" data-complaint="${i.id}" data-status="In Progress">⏳ In Progress</button>
+            <button class="action-btn" data-complaint="${i.id}" data-status="Resolved">✅ Resolve</button>
+          </div>
+        </article>`;
+      }).join("")
     : '<div class="empty-state"><div class="empty-icon">🛠</div><p>No complaints yet.</p></div>';
   bindAdminActions(overview);
+}
+
+async function setAssuranceDate(id) {
+  const el = document.getElementById(`ad_${id}`);
+  if (!el || !el.value) { alert("Please select a date first."); return; }
+  try {
+    await api(`/api/complaints/${id}`, { method: "PATCH", body: JSON.stringify({ assuranceDate: el.value }) });
+    window.location.reload();
+  } catch (err) { alert(err.message); }
 }
 
 /* ── IVR Simulated Call Screen ── */
