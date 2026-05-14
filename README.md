@@ -42,7 +42,7 @@ TWILIO_PHONE_NUMBER=
 
 ## Demo Credentials
 
-- Student: `STU1001` / `nevermore123`
+- Student: `205119` / `pavi123`
 - Admin: `ADMIN01` / `ravens@123`
 
 ## Notes
