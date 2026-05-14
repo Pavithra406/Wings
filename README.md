@@ -53,3 +53,4 @@ TWILIO_PHONE_NUMBER=
 - Parent approval is implemented through secure approval links at `parent-approval.html`.
 - `TWILIO_*` values can be stored in `backend/.env` for future voice-call integration, but the current workflow uses approval links rather than automated calls.
 "# Smart-Hostel" 
+"# Wings" 
