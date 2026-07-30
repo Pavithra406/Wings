@@ -1,56 +1,27 @@
-# Smart Hostel Management System
-Hostel management system built with HTML, CSS, JavaScript, and Node.js/Express.
+<div align="center">
 
-## Features
+# 🪶 Wings
 
-- Gothic landing page with animated portal entry
-- Student login with admin-provisioned credentials
-- Student dashboard for mess menu, complaints, gate pass, leave, room swap, and food feedback
-- Admin dashboard for approvals, complaint handling, menu management, and analytics
-- Parent approval links for gate pass and leave requests
-- QR-enabled gate pass generation after full approval
-- Food feedback page with embedded Google Form links
-- SQL schema included in `database/schema.sql`
+### *Empowering Seamless Connectivity & High-Performance Digital Experiences*
 
-## Run
+[![GitHub Stars](https://img.shields.io/github/stars/Pavithra406/Wings?style=for-the-badge&color=gold)](https://github.com/Pavithra406/Wings/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/Pavithra406/Wings?style=for-the-badge&color=orange)](https://github.com/Pavithra406/Wings/network/members)
+[![GitHub Issues](https://img.shields.io/github/issues/Pavithra406/Wings?style=for-the-badge&color=red)](https://github.com/Pavithra406/Wings/issues)
+[![License](https://img.shields.io/github/license/Pavithra406/Wings?style=for-the-badge&color=blue)](LICENSE)
 
-1. Install dependencies:
+---
 
-```bash
-npm install
-```
+[Key Features](#-key-features) •
+[Tech Stack](#-tech-stack) •
+[Getting Started](#-getting-started) •
+[Architecture](#-architecture) •
+[Contributing](#-contributing) •
+[License](#-license)
 
-2. Start the server:
+</div>
 
-```bash
-npm start
-```
+<br />
 
-3. Open `http://localhost:3000`
+## 🌟 Overview
 
-## Optional Environment
-
-Create `backend/.env` if you want to configure a custom port or public base URL:
-
-```env
-PORT=3000
-APP_BASE_URL=http://localhost:3000
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_PHONE_NUMBER=
-```
-
-## Demo Credentials
-
-- Student: `205119` / `pavi123`
-- Admin: `ADMIN01` / `ravens@123`
-
-## Notes
-
-- The app uses `backend/data/store.json` so it works immediately without a database server.
-- `database/schema.sql` contains the requested MySQL schema for production migration.
-- The live application currently uses Express plus a JSON datastore for local execution and includes a MySQL schema for database integration.
-- Parent approval is implemented through secure approval links at `parent-approval.html`.
-- `TWILIO_*` values can be stored in `backend/.env` for future voice-call integration, but the current workflow uses approval links rather than automated calls.
-"# Smart-Hostel" 
-"# Wings" 
+**Wings** is an open-source platform designed to deliver lightweight, fast, and scalable web solutions. Engineered with modern architecture principles, it offers robust features to accelerate application development and streamline digital workflows.
