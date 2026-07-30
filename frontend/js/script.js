@@ -108,7 +108,31 @@ async function fillStudentHeader() {
   return user;
 }
 
-async function initStudentDashboard() { await fillStudentHeader(); }
+async function initStudentDashboard() {
+  await fillStudentHeader();
+
+  // Live clock
+  const clockEl = document.getElementById('liveClock');
+  if (clockEl) {
+    const tick = () => { clockEl.textContent = new Date().toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit', second:'2-digit' }); };
+    tick(); setInterval(tick, 1000);
+  }
+
+  // Today's menu preview
+  try {
+    const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+    const today = days[new Date().getDay()];
+    const menuData = await api("/api/mess-menu");
+    const todayMenu = (menuData.menu || []).find(m => m.day === today);
+    const el = document.getElementById('todayMenuPreview');
+    if (el && todayMenu) {
+      el.innerHTML = `<strong style="color:#c4b5fd;">${today}</strong> — 
+        🌅 ${todayMenu.breakfast || '—'} &nbsp;|&nbsp; 
+        ☀️ ${todayMenu.lunch || '—'} &nbsp;|&nbsp; 
+        🌙 ${todayMenu.dinner || '—'}`;
+    }
+  } catch(_) {}
+}
 
 /* ── Auto-fill helper ── */
 function autoFill(user) {
@@ -236,8 +260,14 @@ async function initGatePass() {
 
   document.getElementById("gatepassForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    // Validate: returnTime must be after outTime
+    if (data.outTime && data.returnTime && new Date(data.returnTime) <= new Date(data.outTime)) {
+      setMessage("gatepassMessage", "Return time must be after out time.", true);
+      return;
+    }
     try {
-      const r = await api("/api/gatepass", { method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(e.target).entries())) });
+      const r = await api("/api/gatepass", { method: "POST", body: JSON.stringify(data) });
       setMessage("gatepassMessage", r.message);
       e.target.reset();
       // Re-fill after reset
@@ -271,8 +301,13 @@ async function initLeave() {
   }
   document.getElementById("leaveForm")?.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.target).entries());
+    if (data.fromDate && data.toDate && new Date(data.toDate) < new Date(data.fromDate)) {
+      setMessage("leaveMessage", "To date must be on or after from date.", true);
+      return;
+    }
     try {
-      const r = await api("/api/leave", { method: "POST", body: JSON.stringify(Object.fromEntries(new FormData(e.target).entries())) });
+      const r = await api("/api/leave", { method: "POST", body: JSON.stringify(data) });
       setMessage("leaveMessage", r.message);
       e.target.reset();
       if (user) autoFill(user);
@@ -382,27 +417,28 @@ async function getAdminOverview() {
 }
 
 function bindAdminActions(overview) {
+  // FIXED: removed `once: true` — that bug caused buttons to stop working after first click
   document.body.addEventListener("click", async (e) => {
-    const btn = e.target.closest("button");
+    const btn = e.target.closest("button[data-complaint], button[data-gatepass], button[data-leave], button[data-roomswap], button[data-holiday-edit], button[data-holiday-delete]");
     if (!btn) return;
     try {
       if (btn.dataset.complaint) {
+        btn.disabled = true;
         await api(`/api/complaints/${btn.dataset.complaint}`, { method: "PATCH", body: JSON.stringify({ status: btn.dataset.status }) });
         window.location.reload();
-      }
-      if (btn.dataset.gatepass) {
+      } else if (btn.dataset.gatepass) {
+        btn.disabled = true;
         await api(`/api/gatepass/${btn.dataset.gatepass}/status`, { method: "PATCH", body: JSON.stringify({ status: btn.dataset.status }) });
         window.location.reload();
-      }
-      if (btn.dataset.leave) {
+      } else if (btn.dataset.leave) {
+        btn.disabled = true;
         await api(`/api/leave/${btn.dataset.leave}`, { method: "PATCH", body: JSON.stringify({ status: btn.dataset.status }) });
         window.location.reload();
-      }
-      if (btn.dataset.roomswap) {
+      } else if (btn.dataset.roomswap) {
+        btn.disabled = true;
         await api(`/api/room-swap/${btn.dataset.roomswap}`, { method: "PATCH", body: JSON.stringify({ status: btn.dataset.status }) });
         window.location.reload();
-      }
-      if (btn.dataset.holidayEdit) {
+      } else if (btn.dataset.holidayEdit) {
         const item = overview.holidays.find(h => h.id === btn.dataset.holidayEdit);
         const form = document.getElementById("holidayForm");
         if (item && form) {
@@ -410,14 +446,42 @@ function bindAdminActions(overview) {
           form.elements.namedItem("holidayName").value = item.holidayName;
           form.elements.namedItem("holidayDate").value = item.holidayDate;
           form.elements.namedItem("description").value = item.description;
+          form.scrollIntoView({ behavior: "smooth", block: "start" });
         }
-      }
-      if (btn.dataset.holidayDelete) {
+      } else if (btn.dataset.holidayDelete) {
+        if (!confirm("Delete this holiday? This cannot be undone.")) return;
+        btn.disabled = true;
         await api(`/api/holidays/${btn.dataset.holidayDelete}`, { method: "DELETE" });
         window.location.reload();
       }
-    } catch (err) { alert(err.message); }
-  }, { once: true });
+    } catch (err) {
+      btn.disabled = false;
+      showToast(err.message, "error");
+    }
+  });
+}
+
+/* ── Toast notifications ── */
+function showToast(message, type = "success") {
+  let container = document.getElementById("toastContainer");
+  if (!container) {
+    container = document.createElement("div");
+    container.id = "toastContainer";
+    container.style.cssText = "position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;";
+    document.body.appendChild(container);
+  }
+  const toast = document.createElement("div");
+  toast.style.cssText = `
+    padding:12px 20px;border-radius:14px;font-size:0.88rem;font-family:'Manrope',sans-serif;
+    font-weight:600;max-width:320px;box-shadow:0 8px 24px rgba(0,0,0,0.4);
+    background:${type === "error" ? "rgba(127,29,29,0.95)" : "rgba(5,46,22,0.95)"};
+    border:1px solid ${type === "error" ? "rgba(253,164,175,0.3)" : "rgba(52,211,153,0.3)"};
+    color:${type === "error" ? "#fda4af" : "#6ee7b7"};
+    animation:fadeInUp 0.3s ease;
+  `;
+  toast.textContent = (type === "error" ? "❌ " : "✅ ") + message;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3500);
 }
 
 /* ── Modal helpers ── */
@@ -613,15 +677,23 @@ async function initAdminComplaints() {
       }).join("")
     : '<div class="empty-state"><div class="empty-icon">🛠</div><p>No complaints yet.</p></div>';
   bindAdminActions(overview);
+
+  document.getElementById('complaintSearch')?.addEventListener('input', function() {
+    const q = this.value.toLowerCase();
+    document.querySelectorAll('#adminComplaintList .feed-item').forEach(el => {
+      el.style.display = el.textContent.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
 }
 
 async function setAssuranceDate(id) {
   const el = document.getElementById(`ad_${id}`);
-  if (!el || !el.value) { alert("Please select a date first."); return; }
+  if (!el || !el.value) { showToast("Please select a date first.", "error"); return; }
   try {
     await api(`/api/complaints/${id}`, { method: "PATCH", body: JSON.stringify({ assuranceDate: el.value }) });
+    showToast("Assurance date saved.");
     window.location.reload();
-  } catch (err) { alert(err.message); }
+  } catch (err) { showToast(err.message, "error"); }
 }
 
 /* ── IVR Simulated Call Screen ── */
@@ -837,61 +909,100 @@ async function initAdminGatePass() {
 /* ── Admin Leave ── */
 async function initAdminLeave() {
   const [, overview] = await getAdminOverview();
-  document.getElementById("adminLeaveList").innerHTML = overview.leaveRequests.length
-    ? overview.leaveRequests.map(item => `
-      <article class="feed-item">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
-          <div>
-            <h3 style="margin:0 0 4px;">${item.studentName}</h3>
-            <p style="margin:0;font-size:0.8rem;color:var(--muted);">ID: ${item.id} · Room ${item.roomNumber}</p>
+
+  function renderLeave(items) {
+    document.getElementById("adminLeaveList").innerHTML = items.length
+      ? items.map(item => `
+        <article class="feed-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+            <div>
+              <h3 style="margin:0 0 4px;">${item.studentName}</h3>
+              <p style="margin:0;font-size:0.8rem;color:var(--muted);">ID: ${item.id} · Room ${item.roomNumber}</p>
+            </div>
+            <span class="badge ${statusClass(item.status)}">${item.status}</span>
           </div>
-          <span class="badge ${statusClass(item.status)}">${item.status}</span>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
-          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:10px;">
-            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;">From</div>
-            <div style="font-size:0.9rem;font-weight:600;">${item.fromDate}</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;">
+            <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:10px;">
+              <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;">From</div>
+              <div style="font-size:0.9rem;font-weight:600;">${item.fromDate}</div>
+            </div>
+            <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:10px;">
+              <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;">To</div>
+              <div style="font-size:0.9rem;font-weight:600;">${item.toDate}</div>
+            </div>
           </div>
-          <div style="background:rgba(255,255,255,0.03);border:1px solid var(--line);border-radius:10px;padding:10px;">
-            <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:3px;">To</div>
-            <div style="font-size:0.9rem;font-weight:600;">${item.toDate}</div>
+          <p style="margin:0 0 10px;font-size:0.88rem;color:var(--muted);">📋 ${item.reason}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
+            <span class="badge ${statusClass(item.parentApproval||'Pending')}">Parent: ${item.parentApproval||"Pending"}</span>
+            <span class="badge ${statusClass(item.adminApproval||'Pending')}">Admin: ${item.adminApproval||"Pending"}</span>
           </div>
-        </div>
-        <p style="margin:0 0 10px;font-size:0.88rem;color:var(--muted);">📋 ${item.reason}</p>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-          <span class="badge ${statusClass(item.parentApproval||'Pending')}">Parent: ${item.parentApproval||"Pending"}</span>
-          <span class="badge ${statusClass(item.adminApproval||'Pending')}">Admin: ${item.adminApproval||"Pending"}</span>
-        </div>
-        <div style="margin-bottom:12px;">
-          <a href="${item.approvalLink}" target="_blank" rel="noreferrer" style="font-size:0.82rem;color:#c4b5fd;">🔗 Parent approval link</a>
-        </div>
-        <div class="action-row">
-          <button class="action-btn" data-leave="${item.id}" data-status="Approved">✅ Approve</button>
-          <button class="action-btn secondary-btn" data-leave="${item.id}" data-status="Rejected">❌ Reject</button>
-        </div>
-      </article>`).join("")
-    : '<div class="empty-state"><div class="empty-icon">🗓</div><p>No leave requests yet.</p></div>';
+          <div style="margin-bottom:12px;">
+            <a href="${item.approvalLink}" target="_blank" rel="noreferrer" style="font-size:0.82rem;color:#c4b5fd;">🔗 Parent approval link</a>
+          </div>
+          <div class="action-row">
+            <button class="action-btn" data-leave="${item.id}" data-status="Approved">✅ Approve</button>
+            <button class="action-btn secondary-btn" data-leave="${item.id}" data-status="Rejected">❌ Reject</button>
+          </div>
+        </article>`).join("")
+      : '<div class="empty-state"><div class="empty-icon">🗓</div><p>No leave requests found.</p></div>';
+  }
+
+  renderLeave(overview.leaveRequests);
   bindAdminActions(overview);
+
+  function applyLeaveFilters() {
+    const q = (document.getElementById("leaveSearch")?.value || "").toLowerCase();
+    const st = document.getElementById("leaveStatusFilter")?.value || "";
+    const filtered = overview.leaveRequests.filter(i => {
+      const matchText = !q || `${i.studentName} ${i.roomNumber} ${i.reason}`.toLowerCase().includes(q);
+      const matchStatus = !st || i.status === st;
+      return matchText && matchStatus;
+    });
+    renderLeave(filtered);
+    bindAdminActions({ ...overview, leaveRequests: filtered });
+  }
+  document.getElementById("leaveSearch")?.addEventListener("input", applyLeaveFilters);
+  document.getElementById("leaveStatusFilter")?.addEventListener("change", applyLeaveFilters);
 }
 
 /* ── Admin Room Swap ── */
 async function initAdminRoomSwap() {
   const [, overview] = await getAdminOverview();
-  document.getElementById("adminRoomSwapList").innerHTML = overview.roomSwaps.length
-    ? overview.roomSwaps.map(item => `
-      <article class="feed-item">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
-          <h3 style="margin:0;">${item.currentRoomNumber} → ${item.requestedRoomNumber}</h3>
-          <span class="badge ${statusClass(item.status)}">${item.status}</span>
-        </div>
-        <p style="margin:10px 0;font-size:0.88rem;color:var(--muted);">📋 ${item.reason}</p>
-        <div class="action-row">
-          <button class="action-btn" data-roomswap="${item.id}" data-status="Approved">✅ Approve</button>
-          <button class="action-btn secondary-btn" data-roomswap="${item.id}" data-status="Rejected">❌ Reject</button>
-        </div>
-      </article>`).join("")
-    : '<div class="empty-state"><div class="empty-icon">🛏</div><p>No room swap requests yet.</p></div>';
+
+  function renderSwaps(items) {
+    document.getElementById("adminRoomSwapList").innerHTML = items.length
+      ? items.map(item => `
+        <article class="feed-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;">
+            <h3 style="margin:0;">${item.currentRoomNumber} → ${item.requestedRoomNumber}</h3>
+            <span class="badge ${statusClass(item.status)}">${item.status}</span>
+          </div>
+          <p style="margin:10px 0;font-size:0.88rem;color:var(--muted);">📋 ${item.reason}</p>
+          <p style="margin:0 0 10px;font-size:0.78rem;color:var(--muted);">🕐 ${formatDate(item.createdAt)}</p>
+          <div class="action-row">
+            <button class="action-btn" data-roomswap="${item.id}" data-status="Approved">✅ Approve</button>
+            <button class="action-btn secondary-btn" data-roomswap="${item.id}" data-status="Rejected">❌ Reject</button>
+          </div>
+        </article>`).join("")
+      : '<div class="empty-state"><div class="empty-icon">🛏</div><p>No room swap requests found.</p></div>';
+  }
+
+  renderSwaps(overview.roomSwaps);
   bindAdminActions(overview);
+
+  function applySwapFilters() {
+    const q = (document.getElementById("swapSearch")?.value || "").toLowerCase();
+    const st = document.getElementById("swapStatusFilter")?.value || "";
+    const filtered = overview.roomSwaps.filter(i => {
+      const matchText = !q || `${i.currentRoomNumber} ${i.requestedRoomNumber} ${i.reason}`.toLowerCase().includes(q);
+      const matchStatus = !st || i.status === st;
+      return matchText && matchStatus;
+    });
+    renderSwaps(filtered);
+    bindAdminActions({ ...overview, roomSwaps: filtered });
+  }
+  document.getElementById("swapSearch")?.addEventListener("input", applySwapFilters);
+  document.getElementById("swapStatusFilter")?.addEventListener("change", applySwapFilters);
 }
 
 /* ── Admin Holidays ── */
@@ -934,15 +1045,35 @@ async function initAdminHolidays() {
 async function initAdminFeedback() {
   const [, overview] = await getAdminOverview();
   const s = r => "★".repeat(r) + "☆".repeat(5 - r);
-  document.getElementById("adminFeedbackList").innerHTML = overview.feedback.length
-    ? overview.feedback.map(item => `
-      <article class="feed-item">
-        <div style="color:#fbbf24;font-size:1.2rem;margin-bottom:6px;">${s(item.rating)}</div>
-        <h3>${item.rating}/5 Rating</h3>
-        <p>${item.comment}</p>
-        <p style="font-size:0.78rem;color:var(--muted);">${formatDate(item.createdAt)}</p>
-      </article>`).join("")
-    : '<div class="empty-state"><div class="empty-icon">⭐</div><p>No feedback submitted yet.</p></div>';
+
+  // Summary bar
+  const avg = overview.feedback.length
+    ? (overview.feedback.reduce((sum, i) => sum + i.rating, 0) / overview.feedback.length).toFixed(1)
+    : "0.0";
+  const countEl = document.getElementById("feedbackSummary");
+  if (countEl) countEl.textContent = `${overview.feedback.length} reviews · Avg ${avg} ★`;
+
+  function renderFeedback(items) {
+    document.getElementById("adminFeedbackList").innerHTML = items.length
+      ? items.map(item => `
+        <article class="feed-item">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;">
+            <div style="color:#fbbf24;font-size:1.2rem;">${s(item.rating)}</div>
+            <span style="font-size:0.78rem;color:var(--muted);">${formatDate(item.createdAt)}</span>
+          </div>
+          <h3 style="margin:6px 0 4px;">${item.rating}/5 Rating</h3>
+          <p style="margin:0;color:var(--muted);font-size:0.88rem;">${item.comment}</p>
+        </article>`).join("")
+      : '<div class="empty-state"><div class="empty-icon">⭐</div><p>No feedback found.</p></div>';
+  }
+
+  renderFeedback(overview.feedback);
+
+  document.getElementById("feedbackRatingFilter")?.addEventListener("change", function() {
+    const val = this.value;
+    const filtered = val ? overview.feedback.filter(i => String(i.rating) === val) : overview.feedback;
+    renderFeedback(filtered);
+  });
 }
 
 /* ── Parent Approval ── */

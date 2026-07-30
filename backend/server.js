@@ -337,10 +337,24 @@ app.post("/api/mess-menu/upload", upload.single("menuFile"), (req, res) => {
   }
 });
 
+/* ── Input validation helpers ── */
+function validateRequired(body, fields) {
+  for (const f of fields) {
+    if (!body[f] || String(body[f]).trim() === "") {
+      return `${f} is required`;
+    }
+  }
+  return null;
+}
+
 /* ── Complaints ── */
 app.get("/api/complaints", (req, res) => res.json(readStore().complaints));
 
 app.post("/api/complaints", (req, res) => {
+  const err = validateRequired(req.body, ["roomNumber", "complaintType", "issueDescription"]);
+  if (err) return res.status(400).json({ message: err });
+  const priority = Number(req.body.priority);
+  if (priority && (priority < 1 || priority > 5)) return res.status(400).json({ message: "Priority must be 1–5" });
   const store = readStore();
   const complaint = {
     id: nextId("CMP", store.complaints),
@@ -378,6 +392,11 @@ app.get("/api/gatepass", (req, res) => {
 });
 
 app.post("/api/gatepass", (req, res) => {
+  const err = validateRequired(req.body, ["studentName", "roomNumber", "outTime", "returnTime", "reason"]);
+  if (err) return res.status(400).json({ message: err });
+  if (new Date(req.body.returnTime) <= new Date(req.body.outTime)) {
+    return res.status(400).json({ message: "Return time must be after out time" });
+  }
   const store = readStore();
   const student = findStudent(store, req.body);
   const approvalToken = createToken();
@@ -534,6 +553,11 @@ app.get("/api/leave", (req, res) => {
 });
 
 app.post("/api/leave", (req, res) => {
+  const err = validateRequired(req.body, ["studentName", "roomNumber", "fromDate", "toDate", "reason"]);
+  if (err) return res.status(400).json({ message: err });
+  if (new Date(req.body.toDate) < new Date(req.body.fromDate)) {
+    return res.status(400).json({ message: "To date must be on or after from date" });
+  }
   const store = readStore();
   const student = findStudent(store, req.body);
   const approvalToken = createToken();
@@ -598,6 +622,10 @@ app.patch("/api/room-swap/:id", (req, res) => {
 app.get("/api/feedback", (req, res) => res.json(readStore().feedback));
 
 app.post("/api/feedback", (req, res) => {
+  const rating = Number(req.body.rating);
+  if (!rating || rating < 1 || rating > 5) return res.status(400).json({ message: "Rating must be 1–5" });
+  const err = validateRequired(req.body, ["comment"]);
+  if (err) return res.status(400).json({ message: err });
   const store = readStore();
   const feedback = {
     id: nextId("FDB", store.feedback),
@@ -617,6 +645,8 @@ app.get("/api/holidays", (req, res) => {
 });
 
 app.post("/api/holidays", (req, res) => {
+  const err = validateRequired(req.body, ["holidayName", "holidayDate"]);
+  if (err) return res.status(400).json({ message: err });
   const store = readStore();
   const holiday = {
     id: nextId("HOL", store.holidays),
@@ -725,6 +755,14 @@ app.get("/api/admin/overview", (req, res) => {
 });
 
 app.get("/", (req, res) => res.sendFile(path.join(FRONTEND_DIR, "index.html")));
+
+/* ── Health check ── */
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", uptime: Math.floor(process.uptime()), timestamp: new Date().toISOString() });
+});
+
+/* ── 404 handler for unknown API routes ── */
+app.use("/api", (req, res) => res.status(404).json({ message: "API route not found" }));
 
 /* ══════════════════════════════════════════════════════════════
    EXPORT ROUTES
